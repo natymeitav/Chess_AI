@@ -20,7 +20,6 @@ class Bishop(Piece):
             line = logicBoard.diagonal()
             return np.all(line[1:-1] == None)
 
-
         elif self.pos[0] + self.pos[1] == new[0] + new[1]:  # bottom --> top
             if self.pos[0] < new[0]:
                 logicBoard = logicBoard[self.pos[0]:new[0] + 1, self.pos[1]:new[1] + 1]
@@ -34,19 +33,20 @@ class Bishop(Piece):
 
     # returns all potential moves
     def getMoves(self, logicBoard):
-        return self.getMovesLine(logicBoard) + self.getMovesLine(np.fliplr(logicBoard))
+        return self.getMovesLine(logicBoard, 1) + self.getMovesLine(logicBoard, -1)
 
-    def getMovesLine(self, logicBoard):
+    # returns the potential moves on diagonal by direction (1 --> main -1 --> secondary)
+    def getMovesLine(self, logicBoard, direction):
         moves = []
 
         # moves over bishop
-        row = self.pos[0]-1
-        col = self.pos[1]-1
+        row = self.pos[0] - 1
+        col = self.pos[1] - direction
 
-        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row,col] is None:
-            moves.append((row,col))
+        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
+            moves.append((row, col))
             row = row - 1
-            col = col - 1
+            col = col - direction
 
         if -1 < row < 8 and -1 < col < 8:
             if logicBoard[row, col].isWhite != self.isWhite:
@@ -54,19 +54,15 @@ class Bishop(Piece):
 
         # moves under bishop
         row = self.pos[0] + 1
-        col = self.pos[1] + 1
+        col = self.pos[1] + direction
 
-        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row,col] is None:
-            moves.append((row,col))
+        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
+            moves.append((row, col))
             row = row + 1
-            col = col + 1
+            col = col + direction
 
         if -1 < row < 8 and -1 < col < 8:
-            if logicBoard[row,col].isWhite != self.isWhite:
+            if logicBoard[row, col].isWhite != self.isWhite:
                 moves.append((row, col))
 
         return moves
-
-
-
-
