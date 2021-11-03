@@ -33,10 +33,10 @@ class Bishop(Piece):
 
     # returns all potential moves
     def getMoves(self, logicBoard):
-        return self.getMovesLine(logicBoard, 1) + self.getMovesLine(logicBoard, -1)
+        return self.getMovesDiag(logicBoard, 1) + self.getMovesDiag(logicBoard, -1)
 
     # returns the potential moves on diagonal by direction (1 --> main -1 --> secondary)
-    def getMovesLine(self, logicBoard, direction):
+    def getMovesDiag(self, logicBoard, direction):
         moves = []
 
         # moves over bishop
