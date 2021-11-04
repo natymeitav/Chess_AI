@@ -13,6 +13,8 @@ class Controller:  # keeps the logic board and rules of the game
         self.parent = parent
         self.isGameOver = False
 
+        self.CPU_player = True
+
         self.K1 = self.listLogicBoard[7,4]
         self.K0 = self.listLogicBoard[0,4]
 
@@ -81,9 +83,8 @@ class Controller:  # keeps the logic board and rules of the game
         if self.listLogicBoard[new_pos[0], new_pos[1]].firstMove:
             self.listLogicBoard[new_pos[0], new_pos[1]].firstMove = False
 
-        # update piece's position and turn
+        # update piece's position
         piece.pos = new_pos
-        self.whiteTurn = not self.whiteTurn
 
         # update graph board
         self.parent.updateGraphBoard(old_pos,new_pos)
@@ -92,6 +93,12 @@ class Controller:  # keeps the logic board and rules of the game
         self.upgrading_time(new_pos)
 
         self.checkEndGame()
+
+        # set up next turn
+        if self.CPU_player:
+            print("aaaaa")
+        else:
+            self.whiteTurn = not self.whiteTurn
 
         print(self.listLogicBoard[new_pos[0], new_pos[1]].getMoves(self.listLogicBoard))
 
