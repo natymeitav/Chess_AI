@@ -18,12 +18,36 @@ class Pawn(Piece):
         # forward
         if coefficient * (new[0] - self.pos[0]) == 1 and new[1] == self.pos[1] and logicBoard[new[0], new[1]] is None:
             return True
-        # side capture
+        # capture
         elif coefficient * (new[0] - self.pos[0]) == 1 and abs(new[1] - self.pos[1]) == 1 and logicBoard[
             new[0], new[1]] is not None:
             return True
         return False
 
-        # returns all potential positions
-        def getMoves(self, logicBoard):
-            return []
+    # returns all potential positions
+    def getMoves(self, logicBoard):
+        if self.isWhite:
+            coefficient = -1  # corrects for white
+        else:
+            coefficient = 1
+
+        moves = []
+
+        # moves forward
+        if logicBoard[self.pos[0] + coefficient, self.pos[1]] is None:
+            moves.append((self.pos[0] + coefficient, self.pos[1]))
+            if self.firstMove and logicBoard[self.pos[0] + coefficient * 2, self.pos[1]] is None:
+                moves.append((self.pos[0] + coefficient, self.pos[1]))
+
+        # capture moves
+
+        # right
+        if logicBoard[self.pos[0] + coefficient, self.pos[1] + 1] is not None:
+            if logicBoard[self.pos[0] + coefficient, self.pos[1] + 1].isWhite != self.isWhite:
+                moves.append((self.pos[0] + coefficient, self.pos[1] + 1))
+        # left
+        if logicBoard[self.pos[0] + coefficient, self.pos[1] - 1] is not None:
+            if logicBoard[self.pos[0] + coefficient, self.pos[1] - 1].isWhite != self.isWhite:
+                moves.append((self.pos[0] + coefficient, self.pos[1] - 1))
+
+        return moves
