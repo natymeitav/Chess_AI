@@ -4,8 +4,8 @@ from Piece import Piece
 
 
 class Bishop(Piece):
-    def __init__(self, isWhite, pos):
-        Piece.__init__(self, isWhite, pos, "B")
+    def __init__(self, isWhite, pos,serial):
+        Piece.__init__(self, isWhite, pos, "B",serial)
         self.value = 40 + 80 * (self.isWhite - 1)
 
     # check if bishop can perform move
@@ -45,8 +45,8 @@ class Bishop(Piece):
 
         while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
             moves.append((row, col))
-            row = row - 1
-            col = col - direction
+            row -= 1
+            col -= direction
 
         if -1 < row < 8 and -1 < col < 8:
             if logicBoard[row, col].isWhite != self.isWhite:
@@ -58,11 +58,12 @@ class Bishop(Piece):
 
         while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
             moves.append((row, col))
-            row = row + 1
-            col = col + direction
+            row += 1
+            col += direction
 
         if -1 < row < 8 and -1 < col < 8:
             if logicBoard[row, col].isWhite != self.isWhite:
                 moves.append((row, col))
 
         return moves
+

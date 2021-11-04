@@ -2,8 +2,8 @@ from Piece import Piece
 
 
 class Knight(Piece):
-    def __init__(self, isWhite, pos):
-        Piece.__init__(self, isWhite, pos, "N")
+    def __init__(self, isWhite, pos, serial):
+        Piece.__init__(self, isWhite, pos, "N", serial)
         self.value = 30 + 60 * (self.isWhite - 1)
 
     # check if knight can perform move

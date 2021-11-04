@@ -2,8 +2,8 @@ from Piece import Piece
 import numpy as np
 
 class Queen(Piece):
-    def __init__(self,isWhite,pos):
-        Piece.__init__(self,isWhite,pos,"Q")
+    def __init__(self,isWhite,pos, serial):
+        Piece.__init__(self,isWhite,pos,"Q", serial)
         self.value = 90 + 180 * (self.isWhite - 1)
 
     # check if queen can perform move
@@ -57,8 +57,8 @@ class Queen(Piece):
 
         while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
             moves.append((row, col))
-            row = row - 1
-            col = col - direction
+            row -= 1
+            col -= direction
 
         if -1 < row < 8 and -1 < col < 8:
             if logicBoard[row, col].isWhite != self.isWhite:
@@ -70,8 +70,8 @@ class Queen(Piece):
 
         while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
             moves.append((row, col))
-            row = row + 1
-            col = col + direction
+            row += 1
+            col += direction
 
         if -1 < row < 8 and -1 < col < 8:
             if logicBoard[row, col].isWhite != self.isWhite:
@@ -88,8 +88,8 @@ class Queen(Piece):
 
         while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
             moves.append((row, col))
-            row = row - direction
-            col = col - (direction + 1)
+            row -= direction
+            col -= (direction + 1)
 
         if -1 < row < 8 and -1 < col < 8:
             if logicBoard[row, col].isWhite != self.isWhite:
@@ -101,8 +101,8 @@ class Queen(Piece):
 
         while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
             moves.append((row, col))
-            row = row + direction
-            col = col + (direction + 1)
+            row += direction
+            col += (direction + 1)
 
         if -1 < row < 8 and -1 < col < 8:
             if logicBoard[row, col].isWhite != self.isWhite:

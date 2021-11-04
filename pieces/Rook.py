@@ -4,8 +4,8 @@ from Piece import Piece
 
 
 class Rook(Piece):
-    def __init__(self, isWhite, pos):
-        Piece.__init__(self, isWhite, pos, "R")
+    def __init__(self, isWhite, pos, serial):
+        Piece.__init__(self, isWhite, pos, "R", serial)
         self.value = 50 + 100 * (self.isWhite - 1)
 
     # check if rook can perform move
@@ -41,8 +41,8 @@ class Rook(Piece):
 
         while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
             moves.append((row, col))
-            row = row - direction
-            col = col - (direction + 1)
+            row -= direction
+            col -= (direction + 1)
 
         if -1 < row < 8 and -1 < col < 8:
             if logicBoard[row, col].isWhite != self.isWhite:
@@ -54,8 +54,8 @@ class Rook(Piece):
 
         while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
             moves.append((row, col))
-            row = row + direction
-            col = col + (direction + 1)
+            row += direction
+            col += (direction + 1)
 
         if -1 < row < 8 and -1 < col < 8:
             if logicBoard[row, col].isWhite != self.isWhite:
