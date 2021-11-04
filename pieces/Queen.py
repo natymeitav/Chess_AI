@@ -43,4 +43,69 @@ class Queen(Piece):
 
     # returns all potential positions
     def getMoves(self, logicBoard):
-        return []
+        diagonals = self.getMovesDiag(logicBoard, 1) + self.getMovesDiag(logicBoard, -1)
+        lines = self.getMovesLine(logicBoard, 0) + self.getMovesLine(logicBoard, -1)
+        return diagonals + lines
+
+    # returns the potential moves on diagonal by direction (1 --> main -1 --> secondary)
+    def getMovesDiag(self, logicBoard, direction):
+        moves = []
+
+        # moves over bishop
+        row = self.pos[0] - 1
+        col = self.pos[1] - direction
+
+        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
+            moves.append((row, col))
+            row = row - 1
+            col = col - direction
+
+        if -1 < row < 8 and -1 < col < 8:
+            if logicBoard[row, col].isWhite != self.isWhite:
+                moves.append((row, col))
+
+        # moves under bishop
+        row = self.pos[0] + 1
+        col = self.pos[1] + direction
+
+        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
+            moves.append((row, col))
+            row = row + 1
+            col = col + direction
+
+        if -1 < row < 8 and -1 < col < 8:
+            if logicBoard[row, col].isWhite != self.isWhite:
+                moves.append((row, col))
+
+        return moves
+
+    # returns the potential moves on diagonal by direction (0 --> col -1 --> row)
+    def getMovesLine(self, logicBoard, direction):
+        moves = []
+        # moves over rook
+        row = self.pos[0] - direction
+        col = self.pos[1] - (direction + 1)
+
+        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
+            moves.append((row, col))
+            row = row - direction
+            col = col - (direction + 1)
+
+        if -1 < row < 8 and -1 < col < 8:
+            if logicBoard[row, col].isWhite != self.isWhite:
+                moves.append((row, col))
+
+        # moves under rook
+        row = self.pos[0] + direction
+        col = self.pos[1] + (direction + 1)
+
+        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
+            moves.append((row, col))
+            row = row + direction
+            col = col + (direction + 1)
+
+        if -1 < row < 8 and -1 < col < 8:
+            if logicBoard[row, col].isWhite != self.isWhite:
+                moves.append((row, col))
+
+        return moves
