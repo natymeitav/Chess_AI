@@ -8,7 +8,6 @@ class Pawn(Piece):
 
     # check if pawn can perform move
     def canMakeMove(self, new, logicBoard):
-        print(self.value)
         if self.isWhite:
             coefficient = -1  # corrects for white
         else:
