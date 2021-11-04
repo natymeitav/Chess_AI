@@ -66,11 +66,7 @@ class Controller:  # keeps the logic board and rules of the game
             new_legal = True
         move_legal = self.listLogicBoard[old[0], old[1]].canMakeMove(new, self.listLogicBoard) # can piece move between old and new positions
 
-        if old_legal and new_legal and move_legal:
-            if self.listLogicBoard[old[0], old[1]].firstMove == True:
-                self.listLogicBoard[old[0], old[1]].firstMove = False
-            return True
-        return False
+        return old_legal and new_legal and move_legal
 
     # input: piece's position and new pos
     # output: updates the logic and Graphic board
@@ -80,6 +76,10 @@ class Controller:  # keeps the logic board and rules of the game
         # update logic board
         self.listLogicBoard[old_pos[0], old_pos[1]] = None
         self.listLogicBoard[new_pos[0], new_pos[1]] = piece
+
+        # update piece's first move
+        if self.listLogicBoard[new_pos[0], new_pos[1]].firstMove:
+            self.listLogicBoard[new_pos[0], new_pos[1]].firstMove = False
 
         # update piece's position and turn
         piece.pos = new_pos
