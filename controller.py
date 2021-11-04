@@ -86,7 +86,7 @@ class Controller:  # keeps the logic board and rules of the game
 
         # check for capture
         if self.listLogicBoard[new_pos[0], new_pos[1]] is not None:
-            if
+            self.unpersonPiece(self.listLogicBoard[new_pos[0], new_pos[1]])
 
         # update logic board
         self.listLogicBoard[old_pos[0], old_pos[1]] = None
@@ -135,9 +135,17 @@ class Controller:  # keeps the logic board and rules of the game
     # upgrade pawn to queen
     def upgrading_time(self, new):
         piece = self.listLogicBoard[new[0], new[1]]
-        if piece.type == "P" and (new[0] == 0 or new[0] == 7): # upgrading time
+        if piece.type == "P" and (new[0] == 0 or new[0] == 7):  # upgrading time
             self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new)
             self.parent.upgrading_time(new)
+
+    # input: the captured piece
+    # removes the piece from
+    def unpersonPiece(self,casualty):
+        if casualty.isWhite:
+            self.white[casualty.serialNum] = None
+        else:
+            self.black[casualty.serialNum] = None
 
     # prints board
     def printBoard(self):
