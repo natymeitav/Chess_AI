@@ -42,12 +42,14 @@ class Pawn(Piece):
         # capture moves
 
         # right
-        if logicBoard[self.pos[0] + coefficient, self.pos[1] + 1] is not None:
-            if logicBoard[self.pos[0] + coefficient, self.pos[1] + 1].isWhite != self.isWhite:
-                moves.append((self.pos[0] + coefficient, self.pos[1] + 1))
+        if -1 < self.pos[0] + coefficient < 8 and -1 < self.pos[1] + 1 < 8:
+            if logicBoard[self.pos[0] + coefficient, self.pos[1] + 1] is not None:
+                if logicBoard[self.pos[0] + coefficient, self.pos[1] + 1].isWhite != self.isWhite:
+                    moves.append((self.pos[0] + coefficient, self.pos[1] + 1))
         # left
-        if logicBoard[self.pos[0] + coefficient, self.pos[1] - 1] is not None:
-            if logicBoard[self.pos[0] + coefficient, self.pos[1] - 1].isWhite != self.isWhite:
-                moves.append((self.pos[0] + coefficient, self.pos[1] - 1))
+        if -1 < self.pos[0] + coefficient < 8 and -1 < self.pos[1] - 1 < 8:
+            if logicBoard[self.pos[0] + coefficient, self.pos[1] - 1] is not None:
+                if logicBoard[self.pos[0] + coefficient, self.pos[1] - 1].isWhite != self.isWhite:
+                    moves.append((self.pos[0] + coefficient, self.pos[1] - 1))
 
         return moves
