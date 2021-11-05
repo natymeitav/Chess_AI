@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from Model import CPU
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
 
@@ -42,7 +43,7 @@ class Controller:  # keeps the logic board and rules of the game
         for row in range(6, 8):
             for col in range(len(board)):
                 if row == 7 and col == 4:
-                    piece = King.King(True, (row, col),serial)  # add white king
+                    piece = King.King(True, (row, col), serial)  # add white king
                 else:
                     piece = self.createPiece(random.choice(pieces), True)  # add white piece
                     piece.pos = (row, col)
@@ -125,7 +126,7 @@ class Controller:  # keeps the logic board and rules of the game
         elif str(self.white[12]) != "K1":
             endgame = -1
         # check for insufficient material
-        elif len(set(self.white+self.black)) == 3:
+        elif len(set(self.white + self.black)) == 3:
             endgame = 0
 
         if endgame != -999:
@@ -140,8 +141,8 @@ class Controller:  # keeps the logic board and rules of the game
             self.parent.upgrading_time(new)
 
     # input: the captured piece
-    # removes the piece from
-    def unpersonPiece(self,casualty):
+    # removes the piece from pieces array
+    def unpersonPiece(self, casualty):
         if casualty.isWhite:
             self.white[casualty.serialNum] = None
         else:
