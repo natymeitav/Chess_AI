@@ -110,11 +110,9 @@ class Controller:  # keeps the logic board and rules of the game
 
         # set up next turn
         if self.CPU_player:
-            print("aaaaa")
+            CPU.MakeMove(self.listLogicBoard,self.black,self.white)
         else:
             self.whiteTurn = not self.whiteTurn
-
-        print(self.listLogicBoard[new_pos[0], new_pos[1]].getMoves(self.listLogicBoard))
 
     # check for win or tie
     def checkEndGame(self):

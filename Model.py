@@ -1,13 +1,28 @@
 import copy
 
+
 class CPU:
 
     @staticmethod
-    def getBoards(logic,pieces):
+    def getBoards(logic, pieces):
         boards = []
         for piece in pieces:
             if piece is not None:
-                print(str(piece)+str(piece.getMoves(logic)))
+                for move in piece.getMoves(logic):
+                    temp = copy.deepcopy(logic)
+
+                    temp[move[0],move[1]] = piece
+                    temp[piece.pos[0],piece.pos[1]] = None
+
+                    boards.append(temp)
+
+        return boards
+
+
+    @staticmethod
+    def MakeMove(logic, black, white):
+        for board in CPU.getBoards(logic,black):
+            CPU.printBoard(board)
 
     # input: the captured piece
     # removes the piece from pieces array
@@ -17,10 +32,6 @@ class CPU:
             white[casualty.serialNum] = None
         else:
             black[casualty.serialNum] = None
-
-    @staticmethod
-    def aaaa(logic,black,white):
-        CPU.getBoards(logic,black)
 
     @staticmethod
     def printBoard(listLogicBoard):
@@ -43,5 +54,3 @@ class CPU:
             else:
                 print(square, end=" ")
         print("")
-
-
