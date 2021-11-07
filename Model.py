@@ -9,29 +9,34 @@ class CPU:
         for piece in pieces:
             if piece is not None:
                 for move in piece.getMoves(logic):
-                    temp = copy.deepcopy(logic)
+                    temp_logic = copy.deepcopy(logic)
+                    temp_piece = copy.deepcopy(piece)
 
-                    temp[move[0],move[1]] = piece
-                    temp[piece.pos[0],piece.pos[1]] = None
+                    # check for capture
+                    if temp_logic[move[0], move[1]] is not None:
+                        pieces[temp_logic[move[0], move[1]].serialNum] = None
 
-                    boards.append(temp)
+                    # update boards
+                    temp_logic[move[0], move[1]] = temp_piece
+                    temp_logic[temp_piece.pos[0], temp_piece.pos[1]] = None
+
+                    print(temp_logic[move[0], move[1]])
+
+                    # update piece's first move
+                    if temp_logic[move[0], move[1]].firstMove:
+                        temp_logic[move[0], move[1]].firstMove = False
+
+                    # update piece's position
+                    temp_logic[move[0], move[1]].pos = move
+
+                    boards.append(temp_logic)
 
         return boards
 
-
     @staticmethod
     def MakeMove(logic, black, white):
-        for board in CPU.getBoards(logic,black):
+        for board in CPU.getBoards(logic, black):
             CPU.printBoard(board)
-
-    # input: the captured piece
-    # removes the piece from pieces array
-    @staticmethod
-    def unpersonPiece(black, white, casualty):
-        if casualty.isWhite:
-            white[casualty.serialNum] = None
-        else:
-            black[casualty.serialNum] = None
 
     @staticmethod
     def printBoard(listLogicBoard):
