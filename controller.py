@@ -87,7 +87,7 @@ class Controller:  # keeps the logic board and rules of the game
 
         # check for capture
         if self.listLogicBoard[new_pos[0], new_pos[1]] is not None:
-            self.unpersonPiece(self.listLogicBoard[new_pos[0], new_pos[1]])
+            self.DeletePiece(self.listLogicBoard[new_pos[0], new_pos[1]])
 
         # update logic board
         self.listLogicBoard[old_pos[0], old_pos[1]] = None
@@ -106,13 +106,18 @@ class Controller:  # keeps the logic board and rules of the game
         # check for upgrading time
         self.upgrading_time(new_pos)
 
-        self.checkEndGame()
+        endgame = self.checkEndGame()
 
-        # set up next turn
-        if self.CPU_player:
-            CPU.MakeMove(self.listLogicBoard,self.black,self.white)
-        else:
+        if endgame == -999:
+            # set up next turn
             self.whiteTurn = not self.whiteTurn
+
+            if self.CPU_player and not self.whiteTurn:
+                next_move = CPU.makeMove(self.listLogicBoard, self.black, self.white)
+                self.logMove(next_move[0], next_move[1])
+        else:
+            self.isGameOver = True
+            self.parent.endGame(endgame)
 
     # check for win or tie
     def checkEndGame(self):
@@ -127,9 +132,7 @@ class Controller:  # keeps the logic board and rules of the game
         elif len(set(self.white + self.black)) == 3:
             endgame = 0
 
-        if endgame != -999:
-            self.isGameOver = True
-            self.parent.endGame(endgame)
+        return endgame
 
     # upgrade pawn to queen
     def upgrading_time(self, new):
@@ -140,7 +143,7 @@ class Controller:  # keeps the logic board and rules of the game
 
     # input: the captured piece
     # removes the piece from pieces array
-    def unpersonPiece(self, casualty):
+    def DeletePiece(self, casualty):
         if casualty.isWhite:
             self.white[casualty.serialNum] = None
         else:
