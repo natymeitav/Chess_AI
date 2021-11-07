@@ -116,10 +116,10 @@ Config.set('graphics', 'height', '820')
 Config.write()
 
 
-class ChessApp(App):
-    def build(self):
-        self.title = "Random Chess"
-        return Game()
-
-
-ChessApp().run()
+#class ChessApp(App):
+#    def build(self):
+#        self.title = "Random Chess"
+#        return Game()
+#
+#
+#ChessApp().run()
