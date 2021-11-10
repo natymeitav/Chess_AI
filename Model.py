@@ -47,9 +47,9 @@ class CPU:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if CPU.checkTie(temp_black, temp_white):
-                print("tie")
-                return 0
+            endgame = CPU.checkEndGame(black, white)
+            if endgame != -999:
+                return endgame
 
             piece_pos = board[1][1]
 
@@ -82,9 +82,9 @@ class CPU:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(temp_white)
 
-            if CPU.checkTie(temp_black, temp_white):
-                print("tie")
-                return 0
+            endgame = CPU.checkEndGame(black, white)
+            if endgame != -999:
+                return endgame
 
             piece_pos = board[1][1]
 
@@ -117,9 +117,9 @@ class CPU:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if CPU.checkTie(temp_black, temp_white):
-                print("tie")
-                return 0
+            endgame = CPU.checkEndGame(black,white)
+            if endgame != -999:
+                return endgame
 
             piece_pos = board[1][1]
 
@@ -142,10 +142,21 @@ class CPU:
             black[captured.serialNum] = None
         return black, white, captured.value - moving.value
 
-    # check for tie
+    # check for win or tie
     @staticmethod
-    def checkTie(black, white):
-        return len(set(white + black)) == 3
+    def checkEndGame(black,white):
+        # check for white win
+        endgame = -999
+        if str(black[4]) != "K0":
+            endgame = 1
+        # check for black win
+        elif str(white[12]) != "K1":
+            endgame = -1
+        # check for insufficient material
+        elif len(set(white + black)) == 3:
+            endgame = 0
+
+        return endgame
 
     @staticmethod
     def printBoard(listLogicBoard):
