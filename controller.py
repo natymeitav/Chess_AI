@@ -1,5 +1,8 @@
 import numpy as np
 import random
+
+from kivy.clock import Clock
+
 from Model import CPU
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
@@ -113,8 +116,8 @@ class Controller:  # keeps the logic board and rules of the game
             self.whiteTurn = not self.whiteTurn
 
             if self.CPU_player and not self.whiteTurn:
-                next_move = CPU.makeMove(self.listLogicBoard, self.black, self.white)
-                self.logMove(next_move[0], next_move[1])
+                Clock.schedule_once(self.computer_turn, 0.1)
+
         else:
             self.isGameOver = True
             self.parent.endGame(endgame)
@@ -133,6 +136,11 @@ class Controller:  # keeps the logic board and rules of the game
             endgame = 0
 
         return endgame
+
+    # update computer's turn
+    def computer_turn(self,t1):
+        next_move = CPU.makeMove(self.listLogicBoard, self.black, self.white)
+        self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen
     def upgrading_time(self, new):
