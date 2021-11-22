@@ -299,7 +299,10 @@ class Learner:
             if str(cell) == last:
                 times += 1
             else:
-                result += last + str(times)
+                if times != 1:
+                    result += last + str(times)
+                else:
+                    result += last
                 last = str(cell)
                 times = 1
 

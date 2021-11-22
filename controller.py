@@ -3,7 +3,7 @@ import random
 
 from kivy.clock import Clock
 
-from Model import CPU
+from Model import Learner
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
 
@@ -20,6 +20,8 @@ class Controller:  # keeps the logic board and rules of the game
         self.isGameOver = False
 
         self.CPU_player = True
+
+        self.route = []
 
     # input: the number of lines\cols
     # output: a logic board with every position set to 'empty'
@@ -88,9 +90,12 @@ class Controller:  # keeps the logic board and rules of the game
     def logMove(self, old_pos, new_pos):
         piece = self.listLogicBoard[old_pos[0], old_pos[1]]
 
+        captured = None # captured piece
+
         # check for capture
         if self.listLogicBoard[new_pos[0], new_pos[1]] is not None:
-            self.DeletePiece(self.listLogicBoard[new_pos[0], new_pos[1]])
+            captured = self.listLogicBoard[new_pos[0], new_pos[1]]
+            self.DeletePiece(captured)
 
         # update logic board
         self.listLogicBoard[old_pos[0], old_pos[1]] = None
@@ -111,6 +116,9 @@ class Controller:  # keeps the logic board and rules of the game
 
         endgame = self.checkEndGame()
 
+        # update route
+        self.route.append([Learner.boardToString(self.listLogicBoard),piece,captured])
+
         if endgame == -999:
             # set up next turn
             self.whiteTurn = not self.whiteTurn
@@ -120,6 +128,7 @@ class Controller:  # keeps the logic board and rules of the game
 
         else:
             self.isGameOver = True
+            Learner.learn_route(self.route,endgame)
             self.parent.endGame(endgame)
 
     # check for win or tie
@@ -127,26 +136,26 @@ class Controller:  # keeps the logic board and rules of the game
         # check for white win
         endgame = -999
         if str(self.black[4]) != "K0":
-            endgame = 1
+            endgame = 0
         # check for black win
         elif str(self.white[12]) != "K1":
-            endgame = -1
+            endgame = 1
         # check for insufficient material
         elif len(set(self.white + self.black)) == 3:
-            endgame = 0
+            endgame = 0.1
 
         return endgame
 
     # update computer's turn
     def computer_turn(self,t1):
-        next_move = CPU.makeMove(self.listLogicBoard, self.black, self.white)
+        next_move = Learner.make_move(self.listLogicBoard, self.black)
         self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen
     def upgrading_time(self, new):
         piece = self.listLogicBoard[new[0], new[1]]
         if piece.type == "P" and (new[0] == 0 or new[0] == 7):  # upgrading time
-            self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new)
+            self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new, piece.serialNum)
             self.parent.upgrading_time(new)
 
     # input: the captured piece
