@@ -146,7 +146,7 @@ class Controller:  # keeps the logic board and rules of the game
     def upgrading_time(self, new):
         piece = self.listLogicBoard[new[0], new[1]]
         if piece.type == "P" and (new[0] == 0 or new[0] == 7):  # upgrading time
-            self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new)
+            self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new, piece.serialNum)
             self.parent.upgrading_time(new)
 
     # input: the captured piece
