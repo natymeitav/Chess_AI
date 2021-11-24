@@ -117,7 +117,7 @@ class Controller:  # keeps the logic board and rules of the game
         endgame = self.checkEndGame()
 
         # update route
-        self.route.append([Learner.boardToString(self.listLogicBoard),piece,captured])
+        self.route.append(Learner.boardToString(self.listLogicBoard))
 
         if endgame == -999:
             # set up next turn

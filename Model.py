@@ -35,14 +35,14 @@ class CPU:
 
     # find best next move
     @staticmethod
-    def makeMove(logic, black, white):
+    def make_move(logic, white, black):
 
         # setup max values
         max_val = float('-inf')
-        max_piece = None
+        max_board = None
 
         # find best move for black
-        for board in CPU.getBoards(logic, black):
+        for board in CPU.getBoards(logic, white):
 
             capture_val = 0
 
@@ -51,7 +51,7 @@ class CPU:
             temp_white = copy.deepcopy(white)
 
             endgame = CPU.checkEndGame(black, white)
-            if endgame != -999:
+            if endgame != 1:
                 return endgame
 
             piece_pos = board[1][1]
@@ -65,8 +65,8 @@ class CPU:
             value = CPU.getMin(board[0], temp_black, temp_white, 1) + capture_val
             if value > max_val:
                 max_val = value
-                max_piece = board[1]
-        return max_piece
+                max_board = board
+        return max_board[1]
 
     @staticmethod
     def getMax(logic, black, white, depth):
@@ -79,15 +79,15 @@ class CPU:
         max_val = float('-inf')
 
         # find best move for black
-        for board in CPU.getBoards(logic, black):
+        for board in CPU.getBoards(logic, white):
             capture_val = 0
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
-            temp_white = copy.deepcopy(temp_white)
+            temp_white = copy.deepcopy(white)
 
             endgame = CPU.checkEndGame(black, white)
-            if endgame != -999:
+            if endgame != 1:
                 return endgame
 
             piece_pos = board[1][1]
@@ -114,7 +114,7 @@ class CPU:
         min_val = float('inf')
 
         # find worst move for black
-        for board in CPU.getBoards(logic, white):
+        for board in CPU.getBoards(logic, black):
             capture_val = 0
 
             # copy black and white pieces
@@ -122,7 +122,7 @@ class CPU:
             temp_white = copy.deepcopy(white)
 
             endgame = CPU.checkEndGame(black, white)
-            if endgame != -999:
+            if endgame != 1:
                 return endgame
 
             piece_pos = board[1][1]
@@ -145,18 +145,18 @@ class CPU:
             white[captured.serialNum] = None
         else:
             black[captured.serialNum] = None
-        return black, white, captured.value - moving.value
+        return black, white, -1*captured.value - -1*moving.value
 
     # check for win or tie
     @staticmethod
     def checkEndGame(black, white):
         # check for white win
-        endgame = -999
+        endgame = 1
         if str(black[4]) != "K0":
-            endgame = 1
+            endgame = 999
         # check for black win
         elif str(white[12]) != "K1":
-            endgame = -1
+            endgame = -999
         # check for insufficient material
         elif len(set(white + black)) == 3:
             endgame = 0
@@ -197,7 +197,7 @@ class Learner:
         best_value = Learner.get_past_val(Learner.boardToString(best_move[0]))
 
         for move in potential_moves:
-            val = Learner.get_past_val(Learner.boardToString(move[0]))
+            val = Learner.get_past_val(Learner.boardToString(move[0])) + 0.3 * (Learner.get_capture_val(logicBoard[move[1][0][0],move[1][0][1]], logicBoard[move[1][1][0],move[1][1][1]])/999)
             if val > best_value:
                 best_value = val
                 best_move = move
@@ -255,12 +255,9 @@ class Learner:
     @staticmethod
     # learns given path
     def learn_move(move, last_val, endgame):
-        move, moving, captured = move  # unpack move
-
         memories = open("memories.json", "r+")
         data = json.load(memories)
-        value = Learner.get_past_val(move) + 0.7 * (
-                    last_val - Learner.get_past_val(move) + endgame) + 0.3 * Learner.get_capture_val(moving, captured)
+        value = Learner.get_past_val(move) + 0.7 * (last_val - Learner.get_past_val(move) + endgame)
 
         if move not in data:
             print("")
@@ -282,8 +279,8 @@ class Learner:
         while len(route) != 0:
             move = route[len(route) - 1]
 
-            Learner.learn_move(move, Learner.get_past_val(last), endgame)
-            last = move[0]
+            Learner.learn_move(move, last, endgame)
+            last = Learner.get_past_val(move)
 
             route.pop(len(route) - 1)
 
