@@ -1,59 +1,76 @@
+import numpy as np
 import random
 
-import numpy as np
+from kivy.clock import Clock
 
+from Model import Learner
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
 
 class Controller:  # keeps the logic board and rules of the game
     def __init__(self, cols, parent):
+
+        self.black = []  # black pieces
+        self.white = []  # white pieces
+
         self.listLogicBoard = self.buildLogicBoard(cols)
         self.printBoard()
         self.whiteTurn = True
         self.parent = parent
         self.isGameOver = False
 
-        self.K1 = self.listLogicBoard[7,4]
-        self.K0 = self.listLogicBoard[0,4]
+        self.CPU_player = True
+
+        self.route = []
 
     # input: the number of lines\cols
     # output: a logic board with every position set to 'empty'
     def buildLogicBoard(self, cols):
         board = np.full((cols, cols), None)
         pieces = ["R", "N", "B", "Q", "P"]  # [rook , knight, bishop , queen, pawn]
-
+        serial = 0
         # add pieces to top lines
         for row in range(2):
             for col in range(len(board)):
                 if row == 0 and col == 4:
-                    piece = King.King(False, (row, col))  # add black king
+                    piece = King.King(False, (row, col), serial)  # add black king
                 else:
-                    piece = self.createPiece(random.choice(pieces),False)  # add black piece
+                    piece = self.createPiece(random.choice(pieces), False)  # add black piece
                     piece.pos = (row, col)
+                    piece.serialNum = serial
+
+                serial += 1
+                self.black.append(piece)
                 board[row, col] = piece
 
+        serial = 0
         # add pieces to bottom lines
         for row in range(6, 8):
             for col in range(len(board)):
                 if row == 7 and col == 4:
-                    piece = King.King(True, (row, col))  # add white king
+                    piece = King.King(True, (row, col), serial)  # add white king
                 else:
-                    piece = self.createPiece(random.choice(pieces),True)  # add white piece
+                    piece = self.createPiece(random.choice(pieces), True)  # add white piece
                     piece.pos = (row, col)
+                    piece.serialNum = serial
+
+                serial += 1
+                self.white.append(piece)
                 board[row, col] = piece
+
         return board
 
     def createPiece(self, type, isWhite):
         if type == "R":
-            return Rook.Rook(isWhite, (-999, -999))
+            return Rook.Rook(isWhite, (-999, -999), -999)
         if type == "N":
-            return Knight.Knight(isWhite, (-999, -999))
+            return Knight.Knight(isWhite, (-999, -999), -999)
         if type == "B":
-            return Bishop.Bishop(isWhite, (-999, -999))
+            return Bishop.Bishop(isWhite, (-999, -999), -999)
         if type == "Q":
-            return Queen.Queen(isWhite, (-999, -999))
+            return Queen.Queen(isWhite, (-999, -999), -999)
         if type == "P":
-            return Pawn.Pawn(isWhite, (-999, -999))
+            return Pawn.Pawn(isWhite, (-999, -999), -999)
 
     # input: piece's position and new pos
     # returns if the move made is legal
@@ -64,60 +81,90 @@ class Controller:  # keeps the logic board and rules of the game
             new_legal = self.listLogicBoard[old[0], old[1]].isWhite != self.listLogicBoard[new[0], new[1]].isWhite
         else:
             new_legal = True
-        move_legal = self.listLogicBoard[old[0], old[1]].canMakeMove(new, self.listLogicBoard) # can piece move between old and new positions
+        move_legal = self.listLogicBoard[old[0], old[1]].canMakeMove(new,
+                                                                     self.listLogicBoard)  # can piece move between old and new positions
 
-        if old_legal and new_legal and move_legal:
-            if self.listLogicBoard[old[0], old[1]].firstMove == True:
-                self.listLogicBoard[old[0], old[1]].firstMove = False
-            return True
-        return False
+        return old_legal and new_legal and move_legal
 
-    # input: piece's position and new pos
-    # output: updates the logic and Graphic board
+    # update controller and view to reflect move made
     def logMove(self, old_pos, new_pos):
         piece = self.listLogicBoard[old_pos[0], old_pos[1]]
+
+        captured = None # captured piece
+
+        # check for capture
+        if self.listLogicBoard[new_pos[0], new_pos[1]] is not None:
+            captured = self.listLogicBoard[new_pos[0], new_pos[1]]
+            self.DeletePiece(captured)
 
         # update logic board
         self.listLogicBoard[old_pos[0], old_pos[1]] = None
         self.listLogicBoard[new_pos[0], new_pos[1]] = piece
 
-        # update piece's position and turn
+        # update piece's first move
+        if self.listLogicBoard[new_pos[0], new_pos[1]].firstMove:
+            self.listLogicBoard[new_pos[0], new_pos[1]].firstMove = False
+
+        # update piece's position
         piece.pos = new_pos
-        self.whiteTurn = not self.whiteTurn
 
         # update graph board
-        self.parent.updateGraphBoard(old_pos,new_pos)
+        self.parent.updateGraphBoard(old_pos, new_pos)
 
         # check for upgrading time
         self.upgrading_time(new_pos)
 
-        self.checkEndGame()
+        endgame = self.checkEndGame()
 
-        print(self.listLogicBoard[new_pos[0], new_pos[1]].getMoves(self.listLogicBoard))
+        # update route
+        self.route.append(Learner.boardToString(self.listLogicBoard))
+
+        if endgame == -999:
+            # set up next turn
+            self.whiteTurn = not self.whiteTurn
+
+            if self.CPU_player and not self.whiteTurn:
+                Clock.schedule_once(self.computer_turn, 0.1)
+
+        else:
+            self.isGameOver = True
+            Learner.learn_route(self.route,endgame)
+            self.parent.endGame(endgame)
 
     # check for win or tie
     def checkEndGame(self):
         # check for white win
         endgame = -999
-        if self.K0 not in self.listLogicBoard:
-            endgame = 1
-        # check for black win
-        elif self.K1 not in self.listLogicBoard:
-            endgame = -1
-        # check for insufficient material
-        elif len(set(self.listLogicBoard.reshape(-1))) == 3:
+        if str(self.black[4]) != "K0":
             endgame = 0
+        # check for black win
+        elif str(self.white[12]) != "K1":
+            endgame = 1
+        # check for insufficient material
+        elif len(set(self.white + self.black)) == 3:
+            endgame = 0.1
 
-        if endgame != -999:
-            self.isGameOver = True
-            self.parent.endGame(endgame)
+        return endgame
+
+    # update computer's turn
+    def computer_turn(self,t1):
+        next_move = Learner.make_move(self.listLogicBoard, self.black)
+        self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen
     def upgrading_time(self, new):
         piece = self.listLogicBoard[new[0], new[1]]
-        if piece.type == "P" and (new[0] == 0 or new[0] == 7): # upgrading time
-            self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new)
+        if piece.type == "P" and (new[0] == 0 or new[0] == 7):  # upgrading time
+            self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new, piece.serialNum)
             self.parent.upgrading_time(new)
+
+    # input: the captured piece
+    # removes the piece from pieces array
+    def DeletePiece(self, casualty):
+        if casualty.isWhite:
+            self.white[casualty.serialNum] = None
+        else:
+            self.black[casualty.serialNum] = None
 
     # prints board
     def printBoard(self):
