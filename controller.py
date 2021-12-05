@@ -2,7 +2,7 @@ import numpy as np
 import random
 
 from kivy.clock import Clock
-
+import copy
 from Model import Learner
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
@@ -27,36 +27,38 @@ class Controller:  # keeps the logic board and rules of the game
     # output: a logic board with every position set to 'empty'
     def buildLogicBoard(self, cols):
         board = np.full((cols, cols), None)
-        pieces = ["R", "N", "B", "Q", "P"]  # [rook , knight, bishop , queen, pawn]
+
+        # [R - rook , N - knight , B - bishop , Q - queen , P - pawn]
+        pieces = ["R", "N", "B", "Q", "K", "B", "N", "R", "P", "P", "P", "P", "P", "P", "P", "P"]
         serial = 0
         # add pieces to top lines
+        options = copy.deepcopy(pieces)
         for row in range(2):
             for col in range(len(board)):
-                if row == 0 and col == 4:
-                    piece = King.King(False, (row, col), serial)  # add black king
-                else:
-                    piece = self.createPiece(random.choice(pieces), False)  # add black piece
-                    piece.pos = (row, col)
-                    piece.serialNum = serial
+                piece = self.createPiece(options[0], False)  # add black piece
+                piece.pos = (row, col)
+                piece.serialNum = serial
 
                 serial += 1
                 self.black.append(piece)
                 board[row, col] = piece
 
+                options.pop(0)
+
         serial = 0
         # add pieces to bottom lines
+        options = copy.deepcopy(pieces)
         for row in range(6, 8):
             for col in range(len(board)):
-                if row == 7 and col == 4:
-                    piece = King.King(True, (row, col), serial)  # add white king
-                else:
-                    piece = self.createPiece(random.choice(pieces), True)  # add white piece
-                    piece.pos = (row, col)
-                    piece.serialNum = serial
+                piece = self.createPiece(options[-1], True)  # add white piece
+                piece.pos = (row, col)
+                piece.serialNum = serial
 
                 serial += 1
                 self.white.append(piece)
                 board[row, col] = piece
+
+                options.pop(-1)
 
         return board
 
@@ -71,6 +73,8 @@ class Controller:  # keeps the logic board and rules of the game
             return Queen.Queen(isWhite, (-999, -999), -999)
         if type == "P":
             return Pawn.Pawn(isWhite, (-999, -999), -999)
+        if type == "K":
+            return King.King(isWhite, (-999, -999), -999)
 
     # input: piece's position and new pos
     # returns if the move made is legal
@@ -117,7 +121,7 @@ class Controller:  # keeps the logic board and rules of the game
         endgame = self.checkEndGame()
 
         # update route
-        self.route.append(Learner.boardToString(self.listLogicBoard))
+        self.route.append([Learner.boardToString(self.listLogicBoard),piece,captured])
 
         if endgame == -999:
             # set up next turn
@@ -138,7 +142,7 @@ class Controller:  # keeps the logic board and rules of the game
         if str(self.black[4]) != "K0":
             endgame = 0
         # check for black win
-        elif str(self.white[12]) != "K1":
+        elif str(self.white[11]) != "K1":
             endgame = 1
         # check for insufficient material
         elif len(set(self.white + self.black)) == 3:

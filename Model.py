@@ -2,10 +2,8 @@ import copy
 import json
 import random
 
-import numpy as np
 
-
-class CPU:
+class MinMax:
     # return array of posible moves [board,[position before, position after]]
     @staticmethod
     def getBoards(logic, pieces):
@@ -42,7 +40,7 @@ class CPU:
         max_board = None
 
         # find best move for black
-        for board in CPU.getBoards(logic, white):
+        for board in MinMax.getBoards(logic, white):
 
             capture_val = 0
 
@@ -50,19 +48,19 @@ class CPU:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            endgame = CPU.checkEndGame(black, white)
-            if endgame != 1:
-                return endgame
+            endgame = MinMax.checkEndGame(black, white)
+            if endgame == 900:
+                return board[1]
 
             piece_pos = board[1][1]
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white, capture_val = CPU.deletePiece(temp_black, temp_white,
-                                                                      logic[piece_pos[0], piece_pos[1]],
-                                                                      board[0][piece_pos[0], piece_pos[1]])
+                temp_black, temp_white, capture_val = MinMax.deletePiece(temp_black, temp_white,
+                                                                         logic[piece_pos[0], piece_pos[1]],
+                                                                         board[0][piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, 1) + capture_val
+            value = MinMax.getMin(board[0], temp_black, temp_white, 1) + capture_val
             if value > max_val:
                 max_val = value
                 max_board = board
@@ -79,14 +77,14 @@ class CPU:
         max_val = float('-inf')
 
         # find best move for black
-        for board in CPU.getBoards(logic, white):
+        for board in MinMax.getBoards(logic, white):
             capture_val = 0
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            endgame = CPU.checkEndGame(black, white)
+            endgame = MinMax.checkEndGame(black, white)
             if endgame != 1:
                 return endgame
 
@@ -94,10 +92,10 @@ class CPU:
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                black, white, capture_val = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]],
-                                                            board[0][piece_pos[0], piece_pos[1]])
+                black, white, capture_val = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]],
+                                                               board[0][piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, depth + 1) + capture_val
+            value = MinMax.getMin(board[0], temp_black, temp_white, depth + 1) + capture_val
             if value > max_val:
                 max_val = value
 
@@ -114,14 +112,14 @@ class CPU:
         min_val = float('inf')
 
         # find worst move for black
-        for board in CPU.getBoards(logic, black):
+        for board in MinMax.getBoards(logic, black):
             capture_val = 0
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            endgame = CPU.checkEndGame(black, white)
+            endgame = MinMax.checkEndGame(black, white)
             if endgame != 1:
                 return endgame
 
@@ -129,11 +127,11 @@ class CPU:
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white, capture_val = CPU.deletePiece(temp_black, temp_white,
-                                                                      logic[piece_pos[0], piece_pos[1]],
-                                                                      board[0][piece_pos[0], piece_pos[1]])
+                temp_black, temp_white, capture_val = MinMax.deletePiece(temp_black, temp_white,
+                                                                         logic[piece_pos[0], piece_pos[1]],
+                                                                         board[0][piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMax(board[0], temp_black, temp_white, depth + 1) + capture_val
+            value = MinMax.getMax(board[0], temp_black, temp_white, depth + 1) + capture_val
             if value < min_val:
                 min_val = value
 
@@ -145,7 +143,7 @@ class CPU:
             white[captured.serialNum] = None
         else:
             black[captured.serialNum] = None
-        return black, white, -1*captured.value - -1*moving.value
+        return black, white, moving.value - captured.value
 
     # check for win or tie
     @staticmethod
@@ -155,7 +153,7 @@ class CPU:
         if str(black[4]) != "K0":
             endgame = 999
         # check for black win
-        elif str(white[12]) != "K1":
+        elif str(white[11]) != "K1":
             endgame = -999
         # check for insufficient material
         elif len(set(white + black)) == 3:
@@ -196,12 +194,19 @@ class Learner:
         best_move = random.choice(potential_moves)
         best_value = Learner.get_past_val(Learner.boardToString(best_move[0]))
 
+        if best_value == 0.1:
+            best_value += 0.2*(Learner.get_capture_val(logicBoard[best_move[1][0][0],best_move[1][0][1]], logicBoard[best_move[1][1][0],best_move[1][1][1]])/1089)
+
         for move in potential_moves:
-            val = Learner.get_past_val(Learner.boardToString(move[0])) + 0.3 * (Learner.get_capture_val(logicBoard[move[1][0][0],move[1][0][1]], logicBoard[move[1][1][0],move[1][1][1]])/999)
+            val = Learner.get_past_val(Learner.boardToString(move[0]))
+            if val == 0.1:
+                val += 0.2 * (Learner.get_capture_val(logicBoard[move[1][0][0], move[1][0][1]],
+                                                             logicBoard[move[1][1][0], move[1][1][1]]) / 1089)
             if val > best_value:
                 best_value = val
                 best_move = move
 
+        print(Learner.boardToString(best_move[0]))
         return best_move[1]
 
     # return array of posible moves [board,[position before, position after]]
@@ -257,7 +262,10 @@ class Learner:
     def learn_move(move, last_val, endgame):
         memories = open("memories.json", "r+")
         data = json.load(memories)
-        value = Learner.get_past_val(move) + 0.7 * (last_val - Learner.get_past_val(move) + endgame)
+
+        move, moving, target = move
+        value = Learner.get_past_val(move) + 0.5 * (last_val - Learner.get_past_val(move) + endgame) + 0.2 * (
+                Learner.get_capture_val(moving, target) / 1089)
 
         if move not in data:
             print("")
@@ -280,7 +288,7 @@ class Learner:
             move = route[len(route) - 1]
 
             Learner.learn_move(move, last, endgame)
-            last = Learner.get_past_val(move)
+            last = Learner.get_past_val(move[0])
 
             route.pop(len(route) - 1)
 
