@@ -118,11 +118,10 @@ class Controller:  # keeps the logic board and rules of the game
         # check for upgrading time
         self.upgrading_time(new_pos)
 
-        endgame = self.checkEndGame()
-
         # update route
         self.route.append([Learner.boardToString(self.listLogicBoard),piece,captured])
 
+        endgame = self.checkEndGame()
         if endgame == -999:
             # set up next turn
             self.whiteTurn = not self.whiteTurn
@@ -135,18 +134,36 @@ class Controller:  # keeps the logic board and rules of the game
             Learner.learn_route(self.route,endgame)
             self.parent.endGame(endgame)
 
+    # checks if last board is occurred more than 3 times
+    def hasRepeated(self):
+        board = self.route[-1][0]
+        times = 0
+        for index in range(len(self.route)-1):
+            if board == self.route[index][0]:
+                times += 1
+                if times > 3:
+                    return True
+        return False
+
     # check for win or tie
     def checkEndGame(self):
         # check for white win
         endgame = -999
         if str(self.black[4]) != "K0":
-            endgame = 0
+            print("--white wins--")
+            endgame = -1
         # check for black win
         elif str(self.white[11]) != "K1":
+            print("--black wins--")
             endgame = 1
         # check for insufficient material
         elif len(set(self.white + self.black)) == 3:
-            endgame = 0.1
+            print("--insufficient material--")
+            endgame = 0
+        # check for repeated action
+        elif self.hasRepeated():
+            print("--repeated action--")
+            endgame = 0
 
         return endgame
 

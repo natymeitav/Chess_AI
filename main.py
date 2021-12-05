@@ -71,7 +71,7 @@ class Board(GridLayout):  # Making a randomized chess board
         for row in self.listGraphBoard:
             for square in row:
                 if square.background_color != [0, 0, 0, 0]:
-                    if type == 0:
+                    if type == -1:
                         square.background_color = [0, 1, 0, 1]
                     elif type == 0.1:
                         square.background_color = [0, 1, 1, 1]
