@@ -4,7 +4,7 @@ import numpy as np
 class Queen(Piece):
     def __init__(self,isWhite,pos, serial):
         Piece.__init__(self,isWhite,pos,"Q", serial)
-        self.value = 90 + 180 * (self.isWhite - 1)
+        self.value = 90 - 180 * (self.isWhite)
 
     # check if queen can perform move
     def canMakeMove(self, new, logicBoard):

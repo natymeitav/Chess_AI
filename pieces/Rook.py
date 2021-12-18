@@ -6,7 +6,7 @@ from Piece import Piece
 class Rook(Piece):
     def __init__(self, isWhite, pos, serial):
         Piece.__init__(self, isWhite, pos, "R", serial)
-        self.value = 50 + 100 * (self.isWhite - 1)
+        self.value = 50 - 100 * (self.isWhite)
 
     # check if rook can perform move
     def canMakeMove(self, new, logicBoard):

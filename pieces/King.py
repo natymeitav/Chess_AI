@@ -4,7 +4,7 @@ from Piece import Piece
 class King(Piece):
     def __init__(self, isWhite, pos, serial):
         Piece.__init__(self, isWhite, pos, "K",serial)
-        self.value = 900 + 1800 * (self.isWhite - 1)
+        self.value = 900 - 1800 * (self.isWhite)
 
     # check if king can perform move
     def canMakeMove(self, new, logicBoard):

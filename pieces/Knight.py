@@ -4,7 +4,7 @@ from Piece import Piece
 class Knight(Piece):
     def __init__(self, isWhite, pos, serial):
         self.init__ = Piece.__init__(self, isWhite, pos, "N", serial)
-        self.value = 30 + 60 * (self.isWhite - 1)
+        self.value = 30 - 60 * (self.isWhite)
 
     # check if knight can perform move
     def canMakeMove(self, new, logicBoard):

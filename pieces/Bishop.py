@@ -6,7 +6,7 @@ from Piece import Piece
 class Bishop(Piece):
     def __init__(self, isWhite, pos,serial):
         Piece.__init__(self, isWhite, pos, "B",serial)
-        self.value = 40 + 80 * (self.isWhite - 1)
+        self.value = 40 - 80 * (self.isWhite)
 
     # check if bishop can perform move
     def canMakeMove(self, new, logicBoard):

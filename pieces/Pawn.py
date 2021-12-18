@@ -4,7 +4,7 @@ from Piece import Piece
 class Pawn(Piece):
     def __init__(self, isWhite, pos, serial):
         Piece.__init__(self, isWhite, pos, "P", serial)
-        self.value = 10 + 20 * (self.isWhite - 1)
+        self.value = 10 - 20 * (self.isWhite)
 
     # check if pawn can perform move
     def canMakeMove(self, new, logicBoard):

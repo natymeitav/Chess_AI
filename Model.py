@@ -41,24 +41,22 @@ class CPU:
         # find best move for black
         for board in CPU.getBoards(logic, black):
 
-            capture_val = 0
-
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            endgame = CPU.checkEndGame(black, white)
-            if endgame != -999:
-                return endgame
+            if CPU.checkTie(temp_black, temp_white):
+                print("tie")
+                return 0
 
             piece_pos = board[1][1]
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white, capture_val = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]],
-                                                            board[0][piece_pos[0], piece_pos[1]])
+                temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, 1) + capture_val
+            value = CPU.getMin(board[0], temp_black, temp_white, 1) + CPU.evaluation_val(black,white)
+            print(value)
             if value > max_val:
                 max_val = value
                 max_piece = board[1]
@@ -66,34 +64,31 @@ class CPU:
 
     @staticmethod
     def getMax(logic, black, white, depth):
-
         # check for max depth
-        if depth == 2:
-            return 0
+        if depth == 3:
+            return CPU.evaluation_val(black,white)
 
         # setup max values
         max_val = float('-inf')
 
         # find best move for black
         for board in CPU.getBoards(logic, black):
-            capture_val = 0
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
-            temp_white = copy.deepcopy(temp_white)
+            temp_white = copy.deepcopy(white)
 
-            endgame = CPU.checkEndGame(black, white)
-            if endgame != -999:
-                return endgame
+            if CPU.checkTie(temp_black, temp_white):
+                print("tie")
+                return 0
 
             piece_pos = board[1][1]
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                black, white, capture_val = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]],
-                                                            board[0][piece_pos[0], piece_pos[1]])
+                black, white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, depth + 1) + capture_val
+            value = CPU.getMin(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white)
             if value > max_val:
                 max_val = value
 
@@ -103,60 +98,56 @@ class CPU:
     def getMin(logic, black, white, depth):
 
         # check for max depth
-        if depth == 2:
-            return 0
+        if depth == 3:
+            return CPU.evaluation_val(black,white)
 
         # setup mon values
         min_val = float('inf')
 
         # find worst move for black
         for board in CPU.getBoards(logic, white):
-            capture_val = 0
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            endgame = CPU.checkEndGame(black,white)
-            if endgame != -999:
-                return endgame
+            if CPU.checkTie(temp_black, temp_white):
+                print("tie")
+                return 0
 
             piece_pos = board[1][1]
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white, capture_val = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]],
-                                                            board[0][piece_pos[0], piece_pos[1]])
+                temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMax(board[0], temp_black, temp_white, depth + 1) + capture_val
+            value = CPU.getMax(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white)
             if value < min_val:
                 min_val = value
 
         return min_val
 
     @staticmethod
-    def deletePiece(black, white, captured, moving):
+    def deletePiece(black, white, captured):
         if captured.isWhite:
             white[captured.serialNum] = None
         else:
             black[captured.serialNum] = None
-        return black, white, captured.value - moving.value
+        return black, white
 
-    # check for win or tie
     @staticmethod
-    def checkEndGame(black,white):
-        # check for white win
-        endgame = -999
-        if str(black[4]) != "K0":
-            endgame = 1
-        # check for black win
-        elif str(white[12]) != "K1":
-            endgame = -1
-        # check for insufficient material
-        elif len(set(white + black)) == 3:
-            endgame = 0
+    def evaluation_val(black,white):
+        sum = 0
+        pieces = black + white
+        for piece in pieces:
+            if piece is not None:
+                sum += piece.value
+        return sum
 
-        return endgame
+    # check for tie
+    @staticmethod
+    def checkTie(black, white):
+        return len(set(white + black)) == 3
 
     @staticmethod
     def printBoard(listLogicBoard):
