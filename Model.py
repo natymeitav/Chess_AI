@@ -55,7 +55,7 @@ class CPU:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, 1) + CPU.evaluation_val(black,white)
+            value = CPU.getMin(board[0], temp_black, temp_white, 1) + CPU.evaluation_val(black,white,logic)
             print(value)
             if value > max_val:
                 max_val = value
@@ -64,9 +64,10 @@ class CPU:
 
     @staticmethod
     def getMax(logic, black, white, depth):
+
         # check for max depth
-        if depth == 3:
-            return CPU.evaluation_val(black,white)
+        if depth == 2:
+            return CPU.evaluation_val(black,white,logic)
 
         # setup max values
         max_val = float('-inf')
@@ -86,9 +87,9 @@ class CPU:
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                black, white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+                temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white)
+            value = CPU.getMin(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white,logic)
             if value > max_val:
                 max_val = value
 
@@ -98,8 +99,8 @@ class CPU:
     def getMin(logic, black, white, depth):
 
         # check for max depth
-        if depth == 3:
-            return CPU.evaluation_val(black,white)
+        if depth == 2:
+            return CPU.evaluation_val(black,white,logic)
 
         # setup mon values
         min_val = float('inf')
@@ -121,7 +122,7 @@ class CPU:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMax(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white)
+            value = CPU.getMax(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white,logic)
             if value < min_val:
                 min_val = value
 
@@ -135,8 +136,30 @@ class CPU:
             black[captured.serialNum] = None
         return black, white
 
+    # returns value of board
     @staticmethod
-    def evaluation_val(black,white):
+    def evaluation_val(black,white,logic):
+        return 0.7*CPU.sum_val(black,white)+0.3*CPU.space_val(black,white,logic)
+
+    # returns the difference of black's and white's space
+    @staticmethod
+    def space_val(black,white,logic):
+        black_sum = 0
+        for piece in black:
+            if piece is not None:
+                black_sum += len(piece.getMoves(logic))
+
+        white_sum = 0
+        for piece in white:
+            if piece is not None:
+                white_sum += len(piece.getMoves(logic))
+
+        return black_sum - white_sum
+
+
+    # returns sum of pieces values
+    @staticmethod
+    def sum_val(black,white):
         sum = 0
         pieces = black + white
         for piece in pieces:

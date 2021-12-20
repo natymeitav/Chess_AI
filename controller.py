@@ -48,6 +48,14 @@ class Controller:  # keeps the logic board and rules of the game
         for row in range(6, 8):
             for col in range(len(board)):
                 piece = self.createPiece(options[-1], True)  # add white piece
+
+                # fix queen and king positions
+                if row == 7:
+                    if col == 3:
+                        piece = self.createPiece("Q", True)
+                    elif col == 4:
+                        piece = self.createPiece("K", True)
+
                 piece.pos = (row, col)
                 piece.serialNum = serial
 
@@ -56,7 +64,6 @@ class Controller:  # keeps the logic board and rules of the game
                 board[row, col] = piece
 
                 options.pop(-1)
-
         return board
 
     def createPiece(self, type, isWhite):
@@ -132,7 +139,7 @@ class Controller:  # keeps the logic board and rules of the game
         if str(self.black[4]) != "K0":
             endgame = 1
         # check for black win
-        elif str(self.white[11]) != "K1":
+        elif str(self.white[12]) != "K1":
             endgame = -1
         # check for insufficient material
         elif len(set(self.white + self.black)) == 3:
