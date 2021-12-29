@@ -1,9 +1,10 @@
 import numpy as np
+import numpy as np
 import random
 
 from kivy.clock import Clock
 import copy
-from Model import Learner
+from Model import Learner, Evaluations
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
 
@@ -51,6 +52,14 @@ class Controller:  # keeps the logic board and rules of the game
         for row in range(6, 8):
             for col in range(len(board)):
                 piece = self.createPiece(options[-1], True)  # add white piece
+
+                # fix queen and king positions
+                if row == 7:
+                    if col == 3:
+                        piece = self.createPiece("Q", True)
+                    elif col == 4:
+                        piece = self.createPiece("K", True)
+
                 piece.pos = (row, col)
                 piece.serialNum = serial
 
@@ -119,7 +128,7 @@ class Controller:  # keeps the logic board and rules of the game
         self.upgrading_time(new_pos)
 
         # update route
-        self.route.append([Learner.boardToString(self.listLogicBoard),piece,captured])
+        self.route.append([Learner.boardToString(self.listLogicBoard),Evaluations.evaluation_val(self.black,self.white,self.listLogicBoard)])
 
         endgame = self.checkEndGame()
         if endgame == -999:
@@ -134,17 +143,6 @@ class Controller:  # keeps the logic board and rules of the game
             Learner.learn_route(self.route,endgame)
             self.parent.endGame(endgame)
 
-    # checks if last board is occurred more than 3 times
-    def hasRepeated(self):
-        board = self.route[-1][0]
-        times = 0
-        for index in range(len(self.route)-1):
-            if board == self.route[index][0]:
-                times += 1
-                if times > 3:
-                    return True
-        return False
-
     # check for win or tie
     def checkEndGame(self):
         # check for white win
@@ -153,23 +151,19 @@ class Controller:  # keeps the logic board and rules of the game
             print("--white wins--")
             endgame = -1
         # check for black win
-        elif str(self.white[11]) != "K1":
+        elif str(self.white[12]) != "K1":
             print("--black wins--")
             endgame = 1
         # check for insufficient material
         elif len(set(self.white + self.black)) == 3:
             print("--insufficient material--")
             endgame = 0
-        # check for repeated action
-        elif self.hasRepeated():
-            print("--repeated action--")
-            endgame = 0
 
         return endgame
 
     # update computer's turn
     def computer_turn(self,t1):
-        next_move = Learner.make_move(self.listLogicBoard, self.black)
+        next_move = Learner.make_move(self.listLogicBoard, self.black,self.white)
         self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen
