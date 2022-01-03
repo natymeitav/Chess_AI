@@ -103,8 +103,6 @@ class Controller:  # keeps the logic board and rules of the game
     def logMove(self, old_pos, new_pos):
         piece = self.listLogicBoard[old_pos[0], old_pos[1]]
 
-        captured = None # captured piece
-
         # check for capture
         if self.listLogicBoard[new_pos[0], new_pos[1]] is not None:
             captured = self.listLogicBoard[new_pos[0], new_pos[1]]
@@ -121,11 +119,11 @@ class Controller:  # keeps the logic board and rules of the game
         # update piece's position
         piece.pos = new_pos
 
-        # update graph board
-        self.parent.updateGraphBoard(old_pos, new_pos)
-
         # check for upgrading time
         self.upgrading_time(new_pos)
+
+        # update graph board
+        self.parent.updateGraphBoard(old_pos, new_pos)
 
         # update route
         self.route.append([Learner.boardToString(self.listLogicBoard),Evaluations.evaluation_val(self.black,self.white,self.listLogicBoard)])
@@ -163,7 +161,9 @@ class Controller:  # keeps the logic board and rules of the game
 
     # update computer's turn
     def computer_turn(self,t1):
-        next_move = Learner.make_move(self.listLogicBoard, self.black,self.white)
+        temp_black = copy.deepcopy(self.black)
+        temp_white = copy.deepcopy(self.white)
+        next_move = Learner.make_move(self.listLogicBoard, temp_black,temp_white)
         self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen

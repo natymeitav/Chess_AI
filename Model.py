@@ -37,44 +37,17 @@ class Evaluations:
 
 class Learner:
 
-    # plans board's next move
-    @staticmethod
-    def make_move(logicBoard, black, white):
-        potential_moves, black, white = Learner.getBoards(logicBoard, black, white)
-
-        best_move = random.choice(potential_moves)
-        best_value = Learner.get_past_val(Learner.boardToString(best_move[0]))
-        if best_value == -999:
-            best_value = Evaluations.evaluation_val(black, white, best_move[0])
-        for move in potential_moves:
-            val = Learner.get_past_val(Learner.boardToString(move[0]))
-            if val == -999:
-                val = Evaluations.evaluation_val(black, white, move[0])
-
-            if val > best_value:
-                best_value = val
-                best_move = move
-
-        print(Learner.boardToString(best_move[0]))
-        print("best val: "+str(best_value))
-        return best_move[1]
-
     # return array of posible moves [board,[position before, position after]]
     @staticmethod
-    def getBoards(logic, black, white):
+    def getBoards(logic, pieces):
         boards = []
-        for piece in black:
+        for piece in pieces:
             if piece is not None:
                 for move in piece.getMoves(logic):
                     temp_logic = copy.deepcopy(logic)
                     temp_piece = copy.deepcopy(piece)
 
                     piece_pos = piece.pos
-
-                    # check for capture
-                    if temp_logic[move[0], move[1]] is not None:
-                        if temp_logic[move[0], move[1]].isWhite != temp_piece.isWhite:
-                            black, white = Learner.deletePiece(black,white,temp_logic[move[0], move[1]])
 
                     # update boards
                     temp_logic[move[0], move[1]] = temp_piece
@@ -89,7 +62,41 @@ class Learner:
 
                     boards.append([temp_logic, [piece_pos, (move[0], move[1])]])
 
-        return boards, black, white
+        return boards
+
+    # find best next move
+    @staticmethod
+    def make_move(logic, black, white):
+
+        # setup max values
+        max_val = float('-inf')
+        max_board = None
+
+        # find best move for black
+        for board in Learner.getBoards(logic, black):
+
+            # copy black and white pieces
+            temp_black = copy.deepcopy(black)
+            temp_white = copy.deepcopy(white)
+
+            piece_pos = board[1][1]
+
+            # check for capture
+            if logic[piece_pos[0], piece_pos[1]] is not None:
+                temp_black, temp_white = Learner.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+
+            value = Learner.get_past_val(Learner.boardToString(board[0]))
+            if value == -999:
+                value = Evaluations.evaluation_val(temp_black,temp_white,logic)
+
+            if value > max_val:
+                max_val = value
+                max_board = board
+
+        print(Learner.boardToString(max_board[0]))
+        print("best val: " + str(max_val))
+
+        return max_board[1]
 
     @staticmethod
     def deletePiece(black, white, captured):
@@ -171,40 +178,3 @@ class Learner:
                 times = 1
 
         return result
-
-
-class randomCPU:
-
-    # return array of posible moves [board,[position before, position after]]
-    @staticmethod
-    def getBoards(logic, pieces):
-        boards = []
-        for piece in pieces:
-            if piece is not None:
-                for move in piece.getMoves(logic):
-                    temp_logic = copy.deepcopy(logic)
-                    temp_piece = copy.deepcopy(piece)
-
-                    piece_pos = piece.pos
-
-                    # update boards
-                    temp_logic[move[0], move[1]] = temp_piece
-                    temp_logic[temp_piece.pos[0], temp_piece.pos[1]] = None
-
-                    # update piece's first move
-                    if temp_logic[move[0], move[1]].firstMove:
-                        temp_logic[move[0], move[1]].firstMove = False
-
-                    # update piece's position
-                    temp_logic[move[0], move[1]].pos = move
-
-                    boards.append([temp_logic, [piece_pos, (move[0], move[1])]])
-
-        return boards
-
-    # returns a random move
-    @staticmethod
-    def make_move(logicBoard, pieces):
-        potential_moves = randomCPU.getBoards(logicBoard, pieces)
-        best_move = random.choice(potential_moves)
-        return best_move[1]
