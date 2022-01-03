@@ -5,25 +5,25 @@ import random
 # Learner's heuristic functions
 class Evaluations:
 
-    # return the ratio between relativistic score based on the heuristic functions
+    # returns value of board
     @staticmethod
     def evaluation_val(black, white, logic):
-        raw_value = 0.7*Evaluations.sum_val(black, white) + 0.3*Evaluations.space_val(black, white, logic)
-        return raw_value
+        return 0.7 * Evaluations.sum_val(black, white) + 0.3 * Evaluations.space_val(black, white, logic)
 
     # returns the difference of black's and white's space
     @staticmethod
     def space_val(black, white, logic):
-        val = 0
+        black_sum = 0
         for piece in black:
             if piece is not None:
-                val += len(piece.getMoves(logic))
+                black_sum += len(piece.getMoves(logic))
 
+        white_sum = 0
         for piece in white:
             if piece is not None:
-                val -= len(piece.getMoves(logic))
+                white_sum += len(piece.getMoves(logic))
 
-        return val
+        return black_sum - white_sum
 
     # returns sum of pieces values
     @staticmethod
