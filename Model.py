@@ -69,8 +69,7 @@ class Learner:
     def make_move(logic, black, white):
 
         # setup max values
-        max_val = float('-inf')
-        max_board = None
+        max_board, max_val = Learner.get_random(black,white,logic)
 
         # find best move for black
         for board in Learner.getBoards(logic, black):
@@ -97,6 +96,27 @@ class Learner:
         print("best val: " + str(max_val))
 
         return max_board[1]
+
+    # returns a random move and it's value
+    @staticmethod
+    def get_random(black,white,logic):
+        board = random.choice(Learner.getBoards(logic,black))
+
+        # copy black and white pieces
+        temp_black = copy.deepcopy(black)
+        temp_white = copy.deepcopy(white)
+
+        piece_pos = board[1][1]
+
+        # check for capture
+        if logic[piece_pos[0], piece_pos[1]] is not None:
+            temp_black, temp_white = Learner.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+
+        value = Learner.get_past_val(Learner.boardToString(board[0]))
+        if value == -999:
+            value = Evaluations.evaluation_val(temp_black, temp_white, logic)
+
+        return board, value
 
     @staticmethod
     def deletePiece(black, white, captured):
