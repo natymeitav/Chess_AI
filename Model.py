@@ -1,12 +1,12 @@
 import copy
-
+import json
 
 # bot's heuristic functions
 class Evaluations:
     # returns value of board
     @staticmethod
     def evaluation_val(black, white, logic):
-        return 0.7 * L_MinMax.sum_val(black, white) + 0.3 * L_MinMax.space_val(black, white, logic)
+        return 0.7 * Evaluations.sum_val(black, white) + 0.3 * Evaluations.space_val(black, white, logic)
 
     # returns the difference of black's and white's space
     @staticmethod
@@ -35,6 +35,68 @@ class Evaluations:
 
 # learns and recalls moves
 class RBD:
+
+    # return array of posible moves [board,[position before, position after]]
+    @staticmethod
+    def getBoards(logic, pieces):
+        boards = []
+        for piece in pieces:
+            if piece is not None:
+                for move in piece.getMoves(logic):
+                    temp_logic = copy.deepcopy(logic)
+                    temp_piece = copy.deepcopy(piece)
+
+                    piece_pos = piece.pos
+
+                    # update boards
+                    temp_logic[move[0], move[1]] = temp_piece
+                    temp_logic[temp_piece.pos[0], temp_piece.pos[1]] = None
+
+                    # update piece's first move
+                    if temp_logic[move[0], move[1]].firstMove:
+                        temp_logic[move[0], move[1]].firstMove = False
+
+                    # update piece's position
+                    temp_logic[move[0], move[1]].pos = move
+
+                    boards.append([temp_logic, [piece_pos, (move[0], move[1])]])
+
+        return boards
+
+    # find best next move
+    @staticmethod
+    def make_move(logic, black, white):
+
+        # setup max values
+        max_val = float('-inf')
+        max_piece = None
+
+        # find best move for black
+        for board in RBD.getBoards(logic, black):
+
+            # copy black and white pieces
+            temp_black = copy.deepcopy(black)
+            temp_white = copy.deepcopy(white)
+
+            piece_pos = board[1][1]
+
+            # check for capture
+            if logic[piece_pos[0], piece_pos[1]] is not None:
+                temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+
+            if MinMax.checkTie(temp_black, temp_white):
+                print("tie")
+                return 0
+
+            value = RBD.get_past_val(RBD.boardToString(board[0]))
+            if value == -9999:
+                value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
+
+            if value > max_val:
+                max_val = value
+                max_piece = board[1]
+        return max_piece, max_val
+
     # get value of move from memories
     @staticmethod
     def get_past_val(move):
@@ -45,9 +107,9 @@ class RBD:
         if move in data:
             memories.close()
             return data[move]
-        else:
+        else: # move doesn't exist
             memories.close()
-            return -999
+            return -9999
 
     # learn path
     @staticmethod
@@ -56,7 +118,7 @@ class RBD:
         data = json.load(memories)
 
         line, evaluation = move
-        val = Learner.get_past_val(line)
+        val = RBD.get_past_val(line)
 
         if line not in data:
             print("")
@@ -83,7 +145,7 @@ class RBD:
         while len(route) != 0:
             move = route[len(route) - 1]
 
-            last = Learner.learn_move(move, last)
+            last = RBD.learn_move(move, last)
 
             route.pop(len(route) - 1)
 
@@ -117,29 +179,29 @@ class MinMax:
 
         # check for max depth
         if depth == 0:
-            return L_MinMax.evaluation_val(black, white, logic)
+            return Evaluations.evaluation_val(black, white, logic)
 
         # setup max values
         max_val = float('-inf')
 
         # find best move for black
-        for board in L_MinMax.getBoards(logic, black):
+        for board in RBD.getBoards(logic, black):
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if L_MinMax.checkTie(temp_black, temp_white):
-                print("tie")
-                return 0
-
             piece_pos = board[1][1]
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white = L_MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+                temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = L_MinMax.getMin(board[0], temp_black, temp_white, depth - 1) + Evaluations.evaluation_val(black, white, logic)
+            if MinMax.checkTie(temp_black, temp_white):
+                print("tie")
+                return 0
+
+            value = MinMax.getMin(board[0], temp_black, temp_white, depth - 1) + Evaluations.evaluation_val(black, white, logic)
             if value > max_val:
                 max_val = value
 
@@ -150,29 +212,30 @@ class MinMax:
 
         # check for max depth
         if depth == 0:
-            return L_MinMax.evaluation_val(black, white, logic)
+            return Evaluations.evaluation_val(black, white, logic)
 
         # setup mon values
         min_val = float('inf')
 
         # find worst move for black
-        for board in L_MinMax.getBoards(logic, white):
+        for board in RBD.getBoards(logic, white):
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if L_MinMax.checkTie(temp_black, temp_white):
-                print("tie")
-                return 0
-
             piece_pos = board[1][1]
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white = L_MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+                temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = L_MinMax.getMax(board[0], temp_black, temp_white, depth - 1) + Evaluations.evaluation_val(black, white, logic)
+            # check for tie
+            if MinMax.checkTie(temp_black, temp_white):
+                print("tie")
+                return 0
+
+            value = MinMax.getMax(board[0], temp_black, temp_white, depth - 1) + Evaluations.evaluation_val(black, white, logic)
             if value < min_val:
                 min_val = value
 
