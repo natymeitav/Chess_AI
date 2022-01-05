@@ -1,5 +1,4 @@
 import numpy as np
-import numpy as np
 import random
 
 from kivy.clock import Clock
@@ -98,7 +97,7 @@ class Controller:  # keeps the logic board and rules of the game
         return old_legal and new_legal and move_legal
 
     # update controller and view to reflect move made
-    def logMove(self, old_pos, new_pos):
+    def logMove(self, old_pos, new_pos, move_value = 0):
         piece = self.listLogicBoard[old_pos[0], old_pos[1]]
 
         # check for capture
@@ -122,6 +121,10 @@ class Controller:  # keeps the logic board and rules of the game
 
         # update graph board
         self.parent.updateGraphBoard(old_pos, new_pos)
+
+        # update route
+        if self.whiteTurn:
+            self.route.append([RBD.boardToString(self.listLogicBoard), move_value])
 
         endgame = self.checkEndGame()
         if endgame == -999:
@@ -157,9 +160,6 @@ class Controller:  # keeps the logic board and rules of the game
     # update computer's turn
     def computer_turn(self,t1):
         next_move, next_val = RBD.make_move(self.listLogicBoard, self.black,self.white)
-
-        # update route
-        self.route.append([RBD.boardToString(self.listLogicBoard),next_val])
 
         self.logMove(next_move[0], next_move[1])
 

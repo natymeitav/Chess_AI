@@ -3,7 +3,6 @@ import json
 
 # bot's heuristic functions
 class Evaluations:
-    # returns value of board
     @staticmethod
     def evaluation_val(black, white, logic):
         return 0.7 * Evaluations.sum_val(black, white) + 0.3 * Evaluations.space_val(black, white, logic)
@@ -84,9 +83,9 @@ class RBD:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            if MinMax.checkTie(temp_black, temp_white):
-                print("tie")
-                return 0
+            endgame = MinMax.checkEndGame(temp_black, temp_white)
+            if endgame != 1:
+                return board[1], 999
 
             value = RBD.get_past_val(RBD.boardToString(board[0]))
             if value == -9999:
@@ -97,7 +96,7 @@ class RBD:
                 max_piece = board[1]
         return max_piece, max_val
 
-    # get value of move from memories
+    # ge t value of move from memories
     @staticmethod
     def get_past_val(move):
         memories = open("memories.json", "r+")
@@ -197,9 +196,9 @@ class MinMax:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            if MinMax.checkTie(temp_black, temp_white):
-                print("tie")
-                return 0
+            endgame = MinMax.checkEndGame(temp_black, temp_white)
+            if endgame != 1:
+                return endgame
 
             value = MinMax.getMin(board[0], temp_black, temp_white, depth - 1) + Evaluations.evaluation_val(black, white, logic)
             if value > max_val:
@@ -230,10 +229,9 @@ class MinMax:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            # check for tie
-            if MinMax.checkTie(temp_black, temp_white):
-                print("tie")
-                return 0
+            endgame = MinMax.checkEndGame(temp_black, temp_white)
+            if endgame != 1:
+                return endgame
 
             value = MinMax.getMax(board[0], temp_black, temp_white, depth - 1) + Evaluations.evaluation_val(black, white, logic)
             if value < min_val:
@@ -249,10 +247,20 @@ class MinMax:
             black[captured.serialNum] = None
         return black, white
 
-    # check for tie
+    # check for win or tie
     @staticmethod
-    def checkTie(black, white):
-        return len(set(white + black)) == 3
+    def checkEndGame(black, white):
+        # check for white win
+        endgame = 1
+        if str(black[4]) != "K0":
+            endgame = -999
+        # check for black win
+        elif str(white[12]) != "K1":
+            endgame = 999
+        # check for insufficient material
+        elif len(set(white + black)) == 3:
+            endgame = 0
+        return endgame
 
     @staticmethod
     def printBoard(listLogicBoard):
