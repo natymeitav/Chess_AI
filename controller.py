@@ -1,8 +1,10 @@
-import copy
-
+import numpy as np
 import numpy as np
 import random
-from Model import CPU
+
+from kivy.clock import Clock
+import copy
+from Model import RBD, Evaluations
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
 
@@ -18,7 +20,7 @@ class Controller:  # keeps the logic board and rules of the game
         self.parent = parent
         self.isGameOver = False
 
-        self.CPU_player = True
+        self.route = []
 
     # input: the number of lines\cols
     # output: a logic board with every position set to 'empty'
@@ -64,6 +66,7 @@ class Controller:  # keeps the logic board and rules of the game
                 board[row, col] = piece
 
                 options.pop(-1)
+
         return board
 
     def createPiece(self, type, isWhite):
@@ -100,7 +103,8 @@ class Controller:  # keeps the logic board and rules of the game
 
         # check for capture
         if self.listLogicBoard[new_pos[0], new_pos[1]] is not None:
-            self.DeletePiece(self.listLogicBoard[new_pos[0], new_pos[1]])
+            captured = self.listLogicBoard[new_pos[0], new_pos[1]]
+            self.DeletePiece(captured)
 
         # update logic board
         self.listLogicBoard[old_pos[0], old_pos[1]] = None
@@ -113,23 +117,23 @@ class Controller:  # keeps the logic board and rules of the game
         # update piece's position
         piece.pos = new_pos
 
-        # update graph board
-        self.parent.updateGraphBoard(old_pos, new_pos)
-
         # check for upgrading time
         self.upgrading_time(new_pos)
 
-        endgame = self.checkEndGame()
+        # update graph board
+        self.parent.updateGraphBoard(old_pos, new_pos)
 
+        endgame = self.checkEndGame()
         if endgame == -999:
             # set up next turn
             self.whiteTurn = not self.whiteTurn
 
-            if self.CPU_player and not self.whiteTurn:
-                next_move = CPU.makeMove(self.listLogicBoard, self.black, self.white)
-                self.logMove(next_move[0], next_move[1])
+            if not self.whiteTurn:
+                Clock.schedule_once(self.computer_turn, 0.1)
+
         else:
             self.isGameOver = True
+            RBD.learn_route(self.route,endgame)
             self.parent.endGame(endgame)
 
     # check for win or tie
@@ -137,21 +141,33 @@ class Controller:  # keeps the logic board and rules of the game
         # check for white win
         endgame = -999
         if str(self.black[4]) != "K0":
-            endgame = 1
+            print("--white wins--")
+            endgame = -1
         # check for black win
         elif str(self.white[12]) != "K1":
-            endgame = -1
+            print("--black wins--")
+            endgame = 1
         # check for insufficient material
         elif len(set(self.white + self.black)) == 3:
+            print("--insufficient material--")
             endgame = 0
 
         return endgame
+
+    # update computer's turn
+    def computer_turn(self,t1):
+        next_move, next_val = RBD.make_move(self.listLogicBoard, self.black,self.white)
+
+        # update route
+        self.route.append([RBD.boardToString(self.listLogicBoard),next_val])
+
+        self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen
     def upgrading_time(self, new):
         piece = self.listLogicBoard[new[0], new[1]]
         if piece.type == "P" and (new[0] == 0 or new[0] == 7):  # upgrading time
-            self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new)
+            self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new, piece.serialNum)
             self.parent.upgrading_time(new)
 
     # input: the captured piece
