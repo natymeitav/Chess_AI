@@ -193,3 +193,76 @@ class CPU:
             else:
                 print(square, end=" ")
         print("")
+
+    # get value of move from memories
+    @staticmethod
+    def get_past_val(move):
+        memories = open("memories.json", "r+")
+
+        data = json.load(memories)
+
+        if move in data:
+            memories.close()
+            return data[move]
+        else:
+            memories.close()
+            return -999
+
+    # learn path
+    @staticmethod
+    def learn_move(move, last_val):
+        memories = open("memories.json", "r+")
+        data = json.load(memories)
+
+        line, evaluation = move
+        val = Learner.get_past_val(line)
+
+        if line not in data:
+            print("")
+            print("--new move learned--")
+            val = evaluation
+
+        value = val + 0.7 * (last_val - val)
+        print(value)
+
+        data[line] = value
+
+        memories.seek(0)
+        memories.truncate()
+
+        json.dump(data, memories)
+
+        return value
+
+    @staticmethod
+    # learns current route
+    def learn_route(route, endgame):
+        last = endgame * 999
+
+        while len(route) != 0:
+            move = route[len(route) - 1]
+
+            last = Learner.learn_move(move, last)
+
+            route.pop(len(route) - 1)
+
+    # returns the board in string form
+    @staticmethod
+    def boardToString(logic):
+        flat = logic.flatten()
+        result = ""
+        last = str(flat[0])
+        times = 0
+
+        for cell in flat:
+            if str(cell) == last:
+                times += 1
+            else:
+                if times != 1:
+                    result += last + str(times)
+                else:
+                    result += last
+                last = str(cell)
+                times = 1
+
+        return result
