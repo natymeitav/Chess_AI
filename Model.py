@@ -95,7 +95,7 @@ class Learner:
         print(Learner.boardToString(max_board[0]))
         print("best val: " + str(max_val))
 
-        return max_board[1]
+        return max_board[1], max_val
 
     # returns a random move and it's value
     @staticmethod

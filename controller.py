@@ -125,9 +125,6 @@ class Controller:  # keeps the logic board and rules of the game
         # update graph board
         self.parent.updateGraphBoard(old_pos, new_pos)
 
-        # update route
-        self.route.append([Learner.boardToString(self.listLogicBoard),Evaluations.evaluation_val(self.black,self.white,self.listLogicBoard)])
-
         endgame = self.checkEndGame()
         if endgame == -999:
             # set up next turn
@@ -161,9 +158,11 @@ class Controller:  # keeps the logic board and rules of the game
 
     # update computer's turn
     def computer_turn(self,t1):
-        temp_black = copy.deepcopy(self.black)
-        temp_white = copy.deepcopy(self.white)
-        next_move = Learner.make_move(self.listLogicBoard, temp_black,temp_white)
+        next_move, next_val = Learner.make_move(self.listLogicBoard, temp_black,temp_white)
+
+        # update route
+        self.route.append([Learner.boardToString(self.listLogicBoard),next_val])
+
         self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen
