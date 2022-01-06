@@ -29,25 +29,27 @@ class Board(GridLayout):  # Making a randomized chess board
         self.addCellsToBoard()
         self.movingPiece = None
 
+        self.controller.computer_turn(0)
+
     # output: an empty graphic board
     def buildGraphBoard(self):
         return np.empty((self.cols, self.cols), dtype=Cell)
 
     # reacting to user's press
-    def reaction(self, b1):
-        if not self.controller.isGameOver:
-            if self.movingPiece is None:
-                if self.controller.listLogicBoard[b1.row, b1.col] is not None:
-                    # checks if the player is clicking on a piece
-                    self.movingPiece = (b1.row, b1.col)
-                    b1.background_color = [0,0,1,1]
-            else:
-                self.listGraphBoard[self.movingPiece[0], self.movingPiece[1]].background_color = [1, 1, 1, 1]
-                if self.controller.isLegal(self.movingPiece, (b1.row, b1.col)) and not self.movingPiece == (b1.row,b1.col):
-                    self.controller.logMove(self.movingPiece, (b1.row, b1.col))
-                    self.controller.printBoard()
-
-                self.movingPiece = None
+    #def reaction(self, b1):
+    #    if not self.controller.isGameOver:
+    #        if self.movingPiece is None:
+    #            if self.controller.listLogicBoard[b1.row, b1.col] is not None:
+    #                # checks if the player is clicking on a piece
+    #                self.movingPiece = (b1.row, b1.col)
+    #                b1.background_color = [0,0,1,1]
+    #        else:
+    #            self.listGraphBoard[self.movingPiece[0], self.movingPiece[1]].background_color = [1, 1, 1, 1]
+    #            if self.controller.isLegal(self.movingPiece, (b1.row, b1.col)) and not self.movingPiece == (b1.row,b1.col):
+    #                self.controller.logMove(self.movingPiece, (b1.row, b1.col))
+    #                self.controller.printBoard()
+    #
+    #            self.movingPiece = None
 
     # adds cells to graphic board
     def addCellsToBoard(self):
@@ -60,7 +62,6 @@ class Board(GridLayout):  # Making a randomized chess board
                     temp_cell.background_down = temp_cell.background_normal = "img/" + str(
                         self.controller.listLogicBoard[
                             row, col]) + ".png"
-                temp_cell.bind(on_press=self.reaction)
                 self.listGraphBoard[row, col] = temp_cell
                 self.add_widget(temp_cell)
 

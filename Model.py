@@ -72,7 +72,7 @@ class Learner:
         max_board, max_val = Learner.get_random(black,white,logic)
 
         # find best move for black
-        for board in Learner.getBoards(logic, black):
+        for board in Learner.getBoards(logic, white):
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
@@ -88,19 +88,19 @@ class Learner:
             if value == -999:
                 value = Evaluations.evaluation_val(temp_black,temp_white,logic)
 
-            if value > max_val:
+            if value < max_val:
                 max_val = value
                 max_board = board
 
         print(Learner.boardToString(max_board[0]))
         print("best val: " + str(max_val))
 
-        return max_board[1]
+        return max_board[1], max_val
 
     # returns a random move and it's value
     @staticmethod
     def get_random(black,white,logic):
-        board = random.choice(Learner.getBoards(logic,black))
+        board = random.choice(Learner.getBoards(logic,white))
 
         # copy black and white pieces
         temp_black = copy.deepcopy(black)
@@ -129,7 +129,7 @@ class Learner:
     # get value of move from memories
     @staticmethod
     def get_past_val(move):
-        memories = open("memories.json", "r+")
+        memories = open("memories1.json", "r+")
 
         data = json.load(memories)
 
@@ -143,7 +143,7 @@ class Learner:
     @staticmethod
     # learns given path
     def learn_move(move, last_val):
-        memories = open("memories.json", "r+")
+        memories = open("memories1.json", "r+")
         data = json.load(memories)
 
         line, evaluation = move

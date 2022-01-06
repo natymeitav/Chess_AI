@@ -5,6 +5,7 @@ import random
 from kivy.clock import Clock
 import copy
 from Model import Learner, Evaluations
+from RBD import RBD
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
 
@@ -22,7 +23,8 @@ class Controller:  # keeps the logic board and rules of the game
 
         self.CPU_player = True
 
-        self.route = []
+        self.routeW = []
+        self.routeB = []
 
     # input: the number of lines\cols
     # output: a logic board with every position set to 'empty'
@@ -100,7 +102,7 @@ class Controller:  # keeps the logic board and rules of the game
         return old_legal and new_legal and move_legal
 
     # update controller and view to reflect move made
-    def logMove(self, old_pos, new_pos):
+    def logMove(self, old_pos, new_pos, value):
         piece = self.listLogicBoard[old_pos[0], old_pos[1]]
 
         # check for capture
@@ -125,20 +127,23 @@ class Controller:  # keeps the logic board and rules of the game
         # update graph board
         self.parent.updateGraphBoard(old_pos, new_pos)
 
-        # update route
-        self.route.append([Learner.boardToString(self.listLogicBoard),Evaluations.evaluation_val(self.black,self.white,self.listLogicBoard)])
-
         endgame = self.checkEndGame()
         if endgame == -999:
             # set up next turn
             self.whiteTurn = not self.whiteTurn
 
-            if self.CPU_player and not self.whiteTurn:
-                Clock.schedule_once(self.computer_turn, 0.1)
+            # update learner's route
+            if self.whiteTurn:
+                self.routeB.append([Learner.boardToString(self.listLogicBoard),value])
+            else:
+                self.routeW.append([Learner.boardToString(self.listLogicBoard), value])
+
+            Clock.schedule_once(self.computer_turn, 0.1)
 
         else:
             self.isGameOver = True
-            Learner.learn_route(self.route,endgame)
+            Learner.learn_route(self.routeW,endgame)
+            RBD.learn_route(self.routeB)
             self.parent.endGame(endgame)
 
     # check for win or tie
@@ -161,10 +166,11 @@ class Controller:  # keeps the logic board and rules of the game
 
     # update computer's turn
     def computer_turn(self,t1):
-        temp_black = copy.deepcopy(self.black)
-        temp_white = copy.deepcopy(self.white)
-        next_move = Learner.make_move(self.listLogicBoard, temp_black,temp_white)
-        self.logMove(next_move[0], next_move[1])
+        if self.whiteTurn:
+            next_move,next_val = Learner.make_move(self.listLogicBoard, self.black,self.white)
+        else:
+            next_move, next_val = RBD.make_move(self.listLogicBoard, self.black, self.white)
+        self.logMove(next_move[0], next_move[1],next_val)
 
     # upgrade pawn to queen
     def upgrading_time(self, new):
