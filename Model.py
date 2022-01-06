@@ -69,7 +69,8 @@ class Learner:
     def make_move(logic, black, white):
 
         # setup max values
-        max_board, max_val = Learner.get_random(black,white,logic)
+        max_board = None
+        max_val = float('inf')
 
         # find best move for black
         for board in Learner.getBoards(logic, white):
@@ -85,7 +86,10 @@ class Learner:
                 temp_black, temp_white = Learner.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
             value = Learner.get_past_val(Learner.boardToString(board[0]))
-            if value == -999:
+            endgame = Learner.checkEndGame(temp_black, temp_white)
+            if endgame != 1:
+                value = endgame
+            elif value == -9999:
                 value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
 
             #print(value)
@@ -99,26 +103,17 @@ class Learner:
 
         return max_board[1], max_val
 
-    # returns a random move and it's value
+    # check for win or tie
     @staticmethod
-    def get_random(black,white,logic):
-        board = random.choice(Learner.getBoards(logic,white))
-
-        # copy black and white pieces
-        temp_black = copy.deepcopy(black)
-        temp_white = copy.deepcopy(white)
-
-        piece_pos = board[1][1]
-
-        # check for capture
-        if logic[piece_pos[0], piece_pos[1]] is not None:
-            temp_black, temp_white = Learner.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
-
-        value = Learner.get_past_val(Learner.boardToString(board[0]))
-        if value == -999:
-            value = Evaluations.evaluation_val(temp_black, temp_white, board[0])
-
-        return board, value
+    def checkEndGame(black,white):
+        endgame = 1
+        # check for black win
+        if str(black[4]) != "K0":
+            endgame = -999
+        # check for insufficient material
+        elif len(set(white + black)) == 3:
+            endgame = 0
+        return endgame
 
     @staticmethod
     def deletePiece(black, white, captured):
@@ -140,7 +135,7 @@ class Learner:
             return data[move]
         else:
             memories.close()
-            return -999
+            return -9999
 
     @staticmethod
     # learns given path

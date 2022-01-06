@@ -5,6 +5,8 @@ from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
 from kivy.uix.layout import Layout
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from controller import Controller
 
 
@@ -14,12 +16,12 @@ class Cell(Button):  # MAKE A BUTTON
     def __init__(self, row, col):
         Button.__init__(self)
         self.bold = False
-        self.font_size = 40
+        self.font_size = 40   
         self.row = row  # cell's row
         self.col = col  # cell's col
 
 
-class Board(GridLayout):  # Making a randomized chess board
+class Board(GridLayout):
 
     def __init__(self):
         GridLayout.__init__(self)
@@ -27,7 +29,6 @@ class Board(GridLayout):  # Making a randomized chess board
         self.listGraphBoard = self.buildGraphBoard()
         self.controller = Controller(self.cols,self)
         self.addCellsToBoard()
-        self.movingPiece = None
 
         self.controller.computer_turn(0)
 
@@ -36,20 +37,15 @@ class Board(GridLayout):  # Making a randomized chess board
         return np.empty((self.cols, self.cols), dtype=Cell)
 
     # reacting to user's press
-    #def reaction(self, b1):
-    #    if not self.controller.isGameOver:
-    #        if self.movingPiece is None:
-    #            if self.controller.listLogicBoard[b1.row, b1.col] is not None:
-    #                # checks if the player is clicking on a piece
-    #                self.movingPiece = (b1.row, b1.col)
-    #                b1.background_color = [0,0,1,1]
-    #        else:
-    #            self.listGraphBoard[self.movingPiece[0], self.movingPiece[1]].background_color = [1, 1, 1, 1]
-    #            if self.controller.isLegal(self.movingPiece, (b1.row, b1.col)) and not self.movingPiece == (b1.row,b1.col):
-    #                self.controller.logMove(self.movingPiece, (b1.row, b1.col))
-    #                self.controller.printBoard()
-    #
-    #            self.movingPiece = None
+    def restart(self, t):
+        self.clear_widgets()
+        if self.controller.isGameOver:
+            self.listGraphBoard = self.buildGraphBoard()
+            self.controller = Controller(self.cols,self)
+            self.addCellsToBoard()
+
+            print("--starting new game--")
+            self.controller.computer_turn(0)
 
     # adds cells to graphic board
     def addCellsToBoard(self):
@@ -62,19 +58,20 @@ class Board(GridLayout):  # Making a randomized chess board
                     temp_cell.background_down = temp_cell.background_normal = "img/" + str(
                         self.controller.listLogicBoard[
                             row, col]) + ".png"
+                temp_cell.bind(on_press=self.restart)
                 self.listGraphBoard[row, col] = temp_cell
                 self.add_widget(temp_cell)
 
     # notify player of end game
-    def endGame(self, endgame):
+    def endGame(self,type):
         for row in self.listGraphBoard:
             for square in row:
                 if square.background_color != [0, 0, 0, 0]:
-                    if endgame == -1:
+                    if type == -1: # white wins
                         square.background_color = [0, 1, 0, 1]
-                    elif endgame == 0.1:
+                    elif type == 0: # tie
                         square.background_color = [0, 1, 1, 1]
-                    elif endgame == 1:
+                    elif type == 1 :# black wins
                         square.background_color = [1, 0, 0, 1]
 
     # updates graph board
@@ -115,7 +112,7 @@ Config.write()
 
 class ChessApp(App):
     def build(self):
-        self.title = "Random Chess"
+        self.title = "Chess AI"
         return Game()
 
 

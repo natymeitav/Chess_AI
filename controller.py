@@ -128,22 +128,22 @@ class Controller:  # keeps the logic board and rules of the game
 
         endgame = self.checkEndGame()
         if endgame == -999:
-            # set up next turn
-            self.whiteTurn = not self.whiteTurn
-
             # update learner's route
             if self.whiteTurn:
-                self.routeB.append([Learner.boardToString(self.listLogicBoard),value])
+                self.routeW.append([Learner.boardToString(self.listLogicBoard),value])
             else:
-                self.routeW.append([Learner.boardToString(self.listLogicBoard), value])
+                self.routeB.append([Learner.boardToString(self.listLogicBoard), value])
 
-            Clock.schedule_once(self.computer_turn, 0.1)
+            # set up next turn
+            self.whiteTurn = not self.whiteTurn
+            Clock.schedule_once(self.computer_turn, 0.4)
 
         else:
             self.isGameOver = True
             Learner.learn_route(self.routeW,endgame)
             RBD.learn_route(self.routeB,endgame)
             self.parent.endGame(endgame)
+            Clock.schedule_once(self.parent.restart, 1)
 
     # checks if last board is occurred more than 3 times
     def hasRepeated(self,route):
@@ -177,8 +177,6 @@ class Controller:  # keeps the logic board and rules of the game
         elif self.hasRepeated(self.routeW) or self.hasRepeated(self.routeB):
             print("--repeated action--")
             endgame = 0
-
-        return endgame
 
         return endgame
 
