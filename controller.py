@@ -1,5 +1,4 @@
 import numpy as np
-import numpy as np
 import random
 
 from kivy.clock import Clock
@@ -143,10 +142,23 @@ class Controller:  # keeps the logic board and rules of the game
         else:
             self.isGameOver = True
             Learner.learn_route(self.routeW,endgame)
-            RBD.learn_route(self.routeB)
+            RBD.learn_route(self.routeB,endgame)
             self.parent.endGame(endgame)
 
-    # check for win or tie
+    # checks if last board is occurred more than 3 times
+    def hasRepeated(self,route):
+        if len(route) == 0:
+            return False
+        board = route[-1][0]
+        times = 0
+        for index in range(len(route) - 1):
+            if board == route[index][0]:
+                times += 1
+                if times > 3:
+                    return True
+        return False
+
+        # check for win or tie
     def checkEndGame(self):
         # check for white win
         endgame = -999
@@ -161,6 +173,12 @@ class Controller:  # keeps the logic board and rules of the game
         elif len(set(self.white + self.black)) == 3:
             print("--insufficient material--")
             endgame = 0
+        # check for repeated action
+        elif self.hasRepeated(self.routeW) or self.hasRepeated(self.routeB):
+            print("--repeated action--")
+            endgame = 0
+
+        return endgame
 
         return endgame
 

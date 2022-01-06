@@ -86,7 +86,9 @@ class Learner:
 
             value = Learner.get_past_val(Learner.boardToString(board[0]))
             if value == -999:
-                value = Evaluations.evaluation_val(temp_black,temp_white,logic)
+                value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
+
+            #print(value)
 
             if value < max_val:
                 max_val = value
@@ -114,7 +116,7 @@ class Learner:
 
         value = Learner.get_past_val(Learner.boardToString(board[0]))
         if value == -999:
-            value = Evaluations.evaluation_val(temp_black, temp_white, logic)
+            value = Evaluations.evaluation_val(temp_black, temp_white, board[0])
 
         return board, value
 
