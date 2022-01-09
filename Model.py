@@ -68,7 +68,7 @@ class RBD:
 
         # setup max values
         max_val = float('-inf')
-        max_piece = None
+        max_board = 0
 
         # find best move for black
         for board in RBD.getBoards(logic, black):
@@ -85,17 +85,23 @@ class RBD:
 
             endgame = MinMax.checkEndGame(temp_black, temp_white)
             if endgame != 1:
-                return board[1], 999
+                return board[1], endgame, RBD.boardToString(board[0])
 
             value = RBD.get_past_val(RBD.boardToString(board[0]))
+
             if value == -9999:
                 # depth = input + 2
                 value = MinMax.getMin(board[0],temp_black,temp_white,1)+Evaluations.evaluation_val(temp_black,temp_white,board[0])
+                print("a: "+str(value))
+            else:
+                print("b: " + str(value))
 
             if value > max_val:
                 max_val = value
-                max_piece = board[1]
-        return max_piece, max_val
+                max_board = board
+
+        print("max_val: "+ str(max_val))
+        return max_board[1], max_val, RBD.boardToString(max_board[0])
 
     # ge t value of move from memories
     @staticmethod
@@ -104,7 +110,7 @@ class RBD:
 
         data = json.load(memories)
 
-        if move in data:
+        if move in data.keys():
             memories.close()
             return data[move]
         else: # move doesn't exist
@@ -126,6 +132,8 @@ class RBD:
             val = evaluation
 
         value = val + 0.7 * (last_val - val)
+
+        print(line)
         print(value)
 
         data[line] = value
@@ -169,6 +177,19 @@ class RBD:
                 times = 1
 
         return result
+
+    @staticmethod
+    def printBoard(listLogicBoard):
+        for row in range(len(listLogicBoard)):
+            print("")
+            for col in range(len(listLogicBoard)):
+                square = listLogicBoard[row, col]
+                if square is None:
+                    print("--", end=" ")
+                else:
+                    print(square, end=" ")
+        print("")
+
 
 
 # calculates next Moves
