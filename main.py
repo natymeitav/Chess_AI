@@ -48,7 +48,6 @@ class Board(GridLayout):  # Making a randomized chess board
                 self.listGraphBoard[self.movingPiece[0], self.movingPiece[1]].background_color = [1, 1, 1, 1]
                 if self.controller.isLegal(self.movingPiece, (b1.row, b1.col)) and not self.movingPiece == (b1.row,b1.col):
                     self.controller.logMove(self.movingPiece, (b1.row, b1.col))
-                    self.controller.printBoard()
 
                 self.movingPiece = None
 

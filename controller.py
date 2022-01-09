@@ -122,6 +122,8 @@ class Controller:  # keeps the logic board and rules of the game
         # update graph board
         self.parent.updateGraphBoard(old_pos, new_pos)
 
+        self.printBoard()
+
         # update route
         if self.whiteTurn:
             self.route.append([RBD.boardToString(self.listLogicBoard), move_value])
