@@ -26,3 +26,10 @@ class King(Piece):
                             moves.append((row, col))
 
         return moves
+
+    def isTreatened(self,hostiles,logic):
+        for piece in hostiles:
+            if piece is not None:
+                if self.pos in piece.getMoves(logic):
+                    return True
+        return False

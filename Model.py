@@ -70,7 +70,7 @@ class Learner:
 
         # setup max values
         max_board = None
-        max_val = float('inf')
+        max_val = float('-inf')
 
         # find best move for black
         for board in Learner.getBoards(logic, black):
@@ -86,7 +86,7 @@ class Learner:
                 temp_black, temp_white = Learner.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
             value = Learner.get_past_val(Learner.boardToString(board[0]))
-            endgame = Learner.checkEndGame(temp_black, temp_white)
+            endgame = Learner.checkEndGame(temp_black, temp_white,board[0])
             if endgame != 1:
                 value = endgame
             elif value == -9999:
@@ -105,11 +105,14 @@ class Learner:
 
     # check for win or tie
     @staticmethod
-    def checkEndGame(black,white):
+    def checkEndGame(black,white, logic):
         endgame = 1
         # check for black win
         if str(white[12]) != "K1":
             endgame = 999
+        # check for white win
+        if black[4] is None or black[4].isTreatened(white,logic):
+            endgame = -999
         # check for insufficient material
         elif len(set(white + black)) == 3:
             endgame = 0
@@ -140,7 +143,7 @@ class Learner:
     @staticmethod
     # learns given path
     def learn_move(move, last_val):
-        memories = open("memories1.json", "r+")
+        memories = open("memories.json", "r+")
         data = json.load(memories)
 
         line, evaluation = move
