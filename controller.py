@@ -137,7 +137,21 @@ class Controller:  # keeps the logic board and rules of the game
             RBD.learn_route(self.route,endgame)
             self.parent.endGame(endgame)
 
-    # check for win or tie
+    # checks if last board is occurred more than 3 times
+    def hasRepeated(self, route):
+        if len(route) == 0:
+            return False
+        board = route[-1][0]
+        times = 0
+        for index in range(len(route) - 1):
+            if board == route[index][0]:
+                times += 1
+                if times > 3:
+                    return True
+        return False
+
+        # check for win or tie
+
     def checkEndGame(self):
         # check for white win
         endgame = -999
@@ -151,6 +165,10 @@ class Controller:  # keeps the logic board and rules of the game
         # check for insufficient material
         elif len(set(self.white + self.black)) == 3:
             print("--insufficient material--")
+            endgame = 0
+        # check for repeated action
+        elif self.hasRepeated(self.route):
+            print("--repeated action--")
             endgame = 0
 
         return endgame
