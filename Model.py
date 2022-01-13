@@ -68,7 +68,7 @@ class RBD:
 
         # setup max values
         max_val = float('-inf')
-        max_board = 0
+        max_board = None
 
         # find best move for black
         for board in RBD.getBoards(logic, black):
