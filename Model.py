@@ -86,7 +86,7 @@ class Learner:
                 temp_black, temp_white = Learner.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
             value = Learner.get_past_val(Learner.boardToString(board[0]))
-            endgame = Learner.checkEndGame(temp_black, temp_white)
+            endgame = Learner.checkEndGame(temp_black, temp_white,board[0])
             if endgame != 1:
                 value = endgame
             elif value == -9999:
@@ -101,15 +101,18 @@ class Learner:
         print(Learner.boardToString(max_board[0]))
         print("best val: " + str(max_val))
 
-        return max_board[1], max_val
+        return max_board[1], max_val, Learner.boardToString(max_board[0])
 
     # check for win or tie
     @staticmethod
-    def checkEndGame(black,white):
+    def checkEndGame(black, white,board):
+        # check for white win
         endgame = 1
-        # check for black win
         if str(black[4]) != "K0":
             endgame = -999
+        # check for black win
+        elif str(white[12]) != "K1" or white[12].isThreatened(black,board):
+            endgame = 999
         # check for insufficient material
         elif len(set(white + black)) == 3:
             endgame = 0

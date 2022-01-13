@@ -101,7 +101,7 @@ class Controller:  # keeps the logic board and rules of the game
         return old_legal and new_legal and move_legal
 
     # update controller and view to reflect move made
-    def logMove(self, old_pos, new_pos, value):
+    def logMove(self, old_pos, new_pos):
         piece = self.listLogicBoard[old_pos[0], old_pos[1]]
 
         # check for capture
@@ -128,12 +128,6 @@ class Controller:  # keeps the logic board and rules of the game
 
         endgame = self.checkEndGame()
         if endgame == -999:
-            # update learner's route
-            if self.whiteTurn:
-                self.routeW.append([Learner.boardToString(self.listLogicBoard),value])
-            else:
-                self.routeB.append([Learner.boardToString(self.listLogicBoard), value])
-
             # set up next turn
             self.whiteTurn = not self.whiteTurn
             Clock.schedule_once(self.computer_turn, 0.4)
@@ -183,10 +177,12 @@ class Controller:  # keeps the logic board and rules of the game
     # update computer's turn
     def computer_turn(self,t1):
         if self.whiteTurn:
-            next_move,next_val = Learner.make_move(self.listLogicBoard, self.black,self.white)
+            next_move,next_val, key = Learner.make_move(self.listLogicBoard, self.black,self.white)
+            self.routeW.append([key, next_val])
         else:
-            next_move, next_val = RBD.make_move(self.listLogicBoard, self.black, self.white)
-        self.logMove(next_move[0], next_move[1],next_val)
+            next_move, next_val, key = RBD.make_move(self.listLogicBoard, self.black, self.white)
+            self.routeB.append([key, next_val])
+        self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen
     def upgrading_time(self, new):
