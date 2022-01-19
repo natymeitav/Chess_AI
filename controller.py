@@ -3,7 +3,7 @@ import random
 
 from kivy.clock import Clock
 import copy
-from Model import Learner, Evaluations
+from Model import Rival
 from RBD import RBD
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
@@ -130,27 +130,14 @@ class Controller:  # keeps the logic board and rules of the game
         if endgame == -999:
             # set up next turn
             self.whiteTurn = not self.whiteTurn
-            Clock.schedule_once(self.computer_turn, 0.4)
+            Clock.schedule_once(self.computer_turn, 1)
 
         else:
             self.isGameOver = True
-            Learner.learn_route(self.routeW,endgame)
+            Rival.learn_route(self.routeW,endgame)
             RBD.learn_route(self.routeB,endgame)
             self.parent.endGame(endgame)
             Clock.schedule_once(self.parent.restart, 1)
-
-    # checks if last board is occurred more than 3 times
-    def hasRepeated(self,route):
-        if len(route) == 0:
-            return False
-        board = route[-1][0]
-        times = 0
-        for index in range(len(route) - 1):
-            if board == route[index][0]:
-                times += 1
-                if times > 3:
-                    return True
-        return False
 
         # check for win or tie
     def checkEndGame(self):
@@ -167,18 +154,14 @@ class Controller:  # keeps the logic board and rules of the game
         elif len(set(self.white + self.black)) == 3:
             print("--insufficient material--")
             endgame = 0
-        # check for repeated action
-        elif self.hasRepeated(self.routeW) or self.hasRepeated(self.routeB):
-            print("--repeated action--")
-            endgame = 0
 
         return endgame
 
     # update computer's turn
     def computer_turn(self,t1):
         if self.whiteTurn:
-            next_move,next_val, key = Learner.make_move(self.listLogicBoard, self.black,self.white)
-            self.routeW.append([key, next_val])
+            next_move, key = Rival.make_move(self.listLogicBoard,self.white)
+            self.routeW.append(key)
         else:
             next_move, next_val, key = RBD.make_move(self.listLogicBoard, self.black, self.white)
             self.routeB.append([key, next_val])
