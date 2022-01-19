@@ -2,40 +2,7 @@ import copy
 import json
 import random
 
-# Learner's heuristic functions
-class Evaluations:
-
-    # returns value of board
-    @staticmethod
-    def evaluation_val(black, white, logic):
-        return 0.7 * Evaluations.sum_val(black, white) + 0.3 * Evaluations.space_val(black, white, logic)
-
-    # returns the difference of black's and white's space
-    @staticmethod
-    def space_val(black, white, logic):
-        black_sum = 0
-        for piece in black:
-            if piece is not None:
-                black_sum += len(piece.getMoves(logic))
-
-        white_sum = 0
-        for piece in white:
-            if piece is not None:
-                white_sum += len(piece.getMoves(logic))
-
-        return black_sum - white_sum
-
-    # returns sum of pieces values
-    @staticmethod
-    def sum_val(black, white):
-        sum = 0
-        pieces = black + white
-        for piece in pieces:
-            if piece is not None:
-                sum += piece.value
-        return sum
-
-class Learner:
+class Rival:
 
     # return array of posible moves [board,[position before, position after]]
     @staticmethod
@@ -66,76 +33,29 @@ class Learner:
 
     # find best next move
     @staticmethod
-    def make_move(logic, black, white):
+    def make_move(logic, white):
+        boards = Rival.getBoards(logic, white)
 
-        # setup max values
-        max_board = None
-        max_val = float('inf')
+        options = Rival.get_options(boards)
 
-        # find best move for black
-        for board in Learner.getBoards(logic, white):
+        if not options:
+            options = boards
 
-            # copy black and white pieces
-            temp_black = copy.deepcopy(black)
-            temp_white = copy.deepcopy(white)
+        choice = random.choice(options)
+        return choice[1], Rival.boardToString(choice[0])
 
-            piece_pos = board[1][1]
 
-            # check for capture
-            if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white = Learner.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
-
-            value = Learner.get_past_val(Learner.boardToString(board[0]))
-            endgame = Learner.checkEndGame(temp_black, temp_white)
-            if endgame != 1:
-                value = endgame
-            elif value == -9999:
-                value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
-
-            #print(value)
-
-            if value < max_val:
-                max_val = value
-                max_board = board
-
-        print(Learner.boardToString(max_board[0]))
-        print("best val: " + str(max_val))
-
-        return max_board[1], max_val, Learner.boardToString(max_board[0])
-
-    # check for win or tie
-    @staticmethod
-    def checkEndGame(black,white):
-        endgame = 1
-        # check for black win
-        if str(black[4]) != "K0":
-            endgame = -999
-        # check for insufficient material
-        elif len(set(white + black)) == 3:
-            endgame = 0
-        return endgame
 
     @staticmethod
-    def deletePiece(black, white, captured):
-        if captured.isWhite:
-            white[captured.serialNum] = None
-        else:
-            black[captured.serialNum] = None
-        return black, white
-
-    # get value of move from memories
-    @staticmethod
-    def get_past_val(move):
+    def get_options(boards):
+        options = []
         memories = open("memories1.json", "r+")
 
-        data = json.load(memories)
+        for board in boards:
+            if Rival.boardToString(board[0]) not in memories:
+                options.append(board)
 
-        if move in data:
-            memories.close()
-            return data[move]
-        else:
-            memories.close()
-            return -9999
+        return options
 
     @staticmethod
     # learns given path
@@ -143,13 +63,12 @@ class Learner:
         memories = open("memories1.json", "r+")
         data = json.load(memories)
 
-        line, evaluation = move
-        val = Learner.get_past_val(line)
+        line = move
+        val = 0.1
 
         if line not in data:
             print("")
             print("--new move learned--")
-            val = evaluation
 
         value = val + 0.7 * (last_val - val)
         print(value)
@@ -171,7 +90,7 @@ class Learner:
         while len(route) != 0:
             move = route[len(route) - 1]
 
-            last = Learner.learn_move(move, last)
+            last = Rival.learn_move(move, last)
 
             route.pop(len(route) - 1)
 
