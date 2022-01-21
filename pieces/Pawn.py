@@ -1,6 +1,5 @@
 from Piece import Piece
 
-
 class Pawn(Piece):
     def __init__(self, isWhite, pos, serial):
         Piece.__init__(self, isWhite, pos, "P", serial)
@@ -34,20 +33,19 @@ class Pawn(Piece):
         moves = []
 
         # moves forward
-        if logicBoard[self.pos[0] + coefficient, self.pos[1]] is None:
-            moves.append((self.pos[0] + coefficient, self.pos[1]))
-            if self.firstMove and logicBoard[self.pos[0] + coefficient * 2, self.pos[1]] is None:
+        if -1 < self.pos[0] + coefficient < 8 and -1 < self.pos[1] + 1 < 8:
+            if logicBoard[self.pos[0] + coefficient, self.pos[1]] is None:
                 moves.append((self.pos[0] + coefficient, self.pos[1]))
+                if self.firstMove and logicBoard[self.pos[0] + coefficient * 2, self.pos[1]] is None:
+                    moves.append((self.pos[0] + coefficient, self.pos[1]))
 
         # capture moves
-
-        # right
         if -1 < self.pos[0] + coefficient < 8 and -1 < self.pos[1] + 1 < 8:
+            # right
             if logicBoard[self.pos[0] + coefficient, self.pos[1] + 1] is not None:
                 if logicBoard[self.pos[0] + coefficient, self.pos[1] + 1].isWhite != self.isWhite:
                     moves.append((self.pos[0] + coefficient, self.pos[1] + 1))
-        # left
-        if -1 < self.pos[0] + coefficient < 8 and -1 < self.pos[1] - 1 < 8:
+            # left
             if logicBoard[self.pos[0] + coefficient, self.pos[1] - 1] is not None:
                 if logicBoard[self.pos[0] + coefficient, self.pos[1] - 1].isWhite != self.isWhite:
                     moves.append((self.pos[0] + coefficient, self.pos[1] - 1))

@@ -2,6 +2,9 @@ import copy
 import json
 import random
 
+import numpy as np
+
+
 class Rival:
 
     # return array of posible moves [board,[position before, position after]]
@@ -36,6 +39,10 @@ class Rival:
     def make_move(logic, white):
         boards = Rival.getBoards(logic, white)
 
+        wining_boards = Rival.check_win(boards)
+        if wining_boards is not None:
+            return wining_boards[1], Rival.boardToString(wining_boards[0])
+
         options = Rival.get_options(boards)
 
         if not options:
@@ -44,7 +51,12 @@ class Rival:
         choice = random.choice(options)
         return choice[1], Rival.boardToString(choice[0])
 
-
+    @staticmethod
+    def check_win(boards):
+        for logic in boards:
+            line = Rival.boardToString(logic[0])
+            if "K0" not in line:
+                return logic
 
     @staticmethod
     def get_options(boards):
