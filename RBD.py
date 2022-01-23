@@ -68,7 +68,7 @@ class RBD:
 
         # setup max values
         max_val = float('-inf')
-        max_board = 0
+        max_board = None
 
         # find best move for black
         for board in RBD.getBoards(logic, black):
@@ -91,7 +91,10 @@ class RBD:
 
             if value == -9999:
                 # depth = input + 2
-                value = MinMax.getMin(board[0],temp_black,temp_white,1)+Evaluations.evaluation_val(temp_black,temp_white,board[0])
+                value = MinMax.getMin(board[0],temp_black,temp_white,0)+Evaluations.evaluation_val(temp_black,temp_white,board[0])
+            #    print("a: "+str(value))
+            #else:
+            #    print("b: " + str(value))
 
             if value > max_val:
                 max_val = value
@@ -197,7 +200,7 @@ class MinMax:
 
         # check for max depth
         if depth == 0:
-            return Evaluations.evaluation_val(black, white, logic)
+            return 0
 
         # setup max values
         max_val = float('-inf')
@@ -230,7 +233,7 @@ class MinMax:
 
         # check for max depth
         if depth == 0:
-            return Evaluations.evaluation_val(black, white, logic)
+            return 0
 
         # setup mon values
         min_val = float('inf')
