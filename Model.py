@@ -1,117 +1,34 @@
-import copy
-import json
+from stockfish import Stockfish
 import random
 
-import numpy as np
 
+class AFO:
 
-class Rival:
-
-    # return array of posible moves [board,[position before, position after]]
-    @staticmethod
-    def getBoards(logic, pieces):
-        boards = []
-        for piece in pieces:
-            if piece is not None:
-                for move in piece.getMoves(logic):
-                    temp_logic = copy.deepcopy(logic)
-                    temp_piece = copy.deepcopy(piece)
-
-                    piece_pos = piece.pos
-
-                    # update boards
-                    temp_logic[move[0], move[1]] = temp_piece
-                    temp_logic[temp_piece.pos[0], temp_piece.pos[1]] = None
-
-                    # update piece's first move
-                    if temp_logic[move[0], move[1]].firstMove:
-                        temp_logic[move[0], move[1]].firstMove = False
-
-                    # update piece's position
-                    temp_logic[move[0], move[1]].pos = move
-
-                    boards.append([temp_logic, [piece_pos, (move[0], move[1])]])
-
-        return boards
-
+    def __init__(self):
+        self.engine = Stockfish(path="stockfishEngine/stockfish_14.1_win_x64_avx2.exe")
     # find best next move
-    @staticmethod
-    def make_move(logic, white):
-        boards = Rival.getBoards(logic, white)
+    def make_move(self, logic, white):
+        move = self.engine.get_best_move()
 
-        options = Rival.get_options(boards)
+        return self.code_to_positions(move)
 
-        if not options:
-            options = boards
+    def code_to_positions(self,code):
+        moving = code[:2]
+        target = code[2:]
 
-        choice = random.choice(options)
-        return choice[1], Rival.boardToString(choice[0])
+        moving = [int(moving[1]),ord(moving[0])-ord('a')]
+        target = [int(target[1]),ord(target[0])-ord('a')]
 
-    @staticmethod
-    def get_options(boards):
-        options = []
-        memories = open("memories1.json", "r+")
+        return [moving,target]
 
-        for board in boards:
-            if Rival.boardToString(board[0]) not in memories:
-                options.append(board)
+    def positions_to_code(self,positions):
+        moving, target = positions
 
-        return options
+        moving = str(chr(moving[1])) + str(chr(moving[0]+ord('a')))
+        target = str(chr(target[1])) + str(chr(target[0] + ord('a')))
 
-    @staticmethod
-    # learns given path
-    def learn_move(move, last_val):
-        memories = open("memories1.json", "r+")
-        data = json.load(memories)
+        return moving + target
 
-        line = move
-        val = 0.1
-
-        if line not in data:
-            print("")
-            print("--new move learned--")
-
-        value = val + 0.7 * (last_val - val)
-        print(value)
-
-        data[line] = value
-
-        memories.seek(0)
-        memories.truncate()
-
-        json.dump(data, memories)
-
-        return value
-
-    @staticmethod
-    # learns current route
-    def learn_route(route, endgame):
-        last = endgame * 999
-
-        while len(route) != 0:
-            move = route[len(route) - 1]
-
-            last = Rival.learn_move(move, last)
-
-            route.pop(len(route) - 1)
-
-    # returns the board in string form
-    @staticmethod
-    def boardToString(logic):
-        flat = logic.flatten()
-        result = ""
-        last = str(flat[0])
-        times = 0
-
-        for cell in flat:
-            if str(cell) == last:
-                times += 1
-            else:
-                if times != 1:
-                    result += last + str(times)
-                else:
-                    result += last
-                last = str(cell)
-                times = 1
-
-        return result
+    def update_board(self,positions):
+        move = self.positions_to_code(positions)
+        self.engine.make_moves_from_current_position([move])

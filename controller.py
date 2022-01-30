@@ -3,7 +3,7 @@ import random
 
 from kivy.clock import Clock
 import copy
-from Model import Rival
+from Model import AFO
 from RBD import RBD
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
@@ -134,7 +134,6 @@ class Controller:  # keeps the logic board and rules of the game
 
         else:
             self.isGameOver = True
-            Rival.learn_route(self.routeW,endgame)
             RBD.learn_route(self.routeB,endgame)
             self.parent.endGame(endgame)
             Clock.schedule_once(self.parent.restart, 1)
@@ -160,8 +159,7 @@ class Controller:  # keeps the logic board and rules of the game
     # update computer's turn
     def computer_turn(self,t1):
         if self.whiteTurn:
-            next_move, key = Rival.make_move(self.listLogicBoard,self.white)
-            self.routeW.append(key)
+            next_move = AFO.make_move(self.listLogicBoard,self.white)
         else:
             next_move, next_val, key = RBD.make_move(self.listLogicBoard, self.black, self.white)
             self.routeB.append([key, next_val])
