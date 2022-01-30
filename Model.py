@@ -1,12 +1,46 @@
+from stockfish import Stockfish
 import copy
-import json
-import random
-
-import numpy as np
 
 
-class Rival:
+class AFO:
 
+    def __init__(self):
+        self.engine = Stockfish(path="stockfishEngine/stockfish_14.1_win_x64_avx2.exe")
+
+    # find best next move
+    def make_move(self, logic,black, white):
+        move = self.engine.get_best_move()
+        print(move)
+
+        positions = self.code_to_positions(move)
+        if positions is None:
+            return MinMax.make_move(logic,black,white)
+        else:
+            return positions
+
+    def code_to_positions(self,code):
+        if code is None:
+            return None
+        moving = code[:2]
+        target = code[2:]
+
+        moving = [8-int(moving[1]),ord(moving[0])-ord('a')]
+        target = [8-int(target[1]),ord(target[0])-ord('a')]
+
+        return [moving,target]
+
+    def positions_to_code(self,moving,target):
+        moving = str(chr(moving[1]+ord('a'))) + str(8-moving[0])
+        target = str(chr(target[1] + ord('a'))) + str(8-target[0])
+
+        return moving + target
+
+    def update_board(self,moving,target):
+        move = self.positions_to_code(moving,target)
+        print(move)
+        self.engine.make_moves_from_current_position([move])
+
+class MinMax:
     # return array of posible moves [board,[position before, position after]]
     @staticmethod
     def getBoards(logic, pieces):
@@ -36,82 +70,171 @@ class Rival:
 
     # find best next move
     @staticmethod
-    def make_move(logic, white):
-        boards = Rival.getBoards(logic, white)
+    def make_move(logic, black, white):
 
-        options = Rival.get_options(boards)
+        # setup max values
+        max_val = float('-inf')
+        max_piece = None
 
-        if not options:
-            options = boards
+        # find best move for black
+        for board in MinMax.getBoards(logic, white):
 
-        choice = random.choice(options)
-        return choice[1], Rival.boardToString(choice[0])
+            # copy black and white pieces
+            temp_black = copy.deepcopy(black)
+            temp_white = copy.deepcopy(white)
+
+            piece_pos = board[1][1]
+
+            # check for capture
+            if logic[piece_pos[0], piece_pos[1]] is not None:
+                temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+
+            value = MinMax.getMin(board[0], temp_black, temp_white, 1) - MinMax.evaluation_val(black, white, logic)
+
+            if MinMax.checkEndGame(black, white) != 1:
+                value = MinMax.checkEndGame(black, white)
+
+            if value > max_val:
+                max_val = value
+                max_piece = board[1]
+        return max_piece
 
     @staticmethod
-    def get_options(boards):
-        options = []
-        memories = open("memories1.json", "r+")
+    def getMax(logic, black, white, depth):
 
-        for board in boards:
-            if Rival.boardToString(board[0]) not in memories:
-                options.append(board)
+        # check for max depth
+        if depth == 3:
+            return -1*MinMax.evaluation_val(black, white, logic)
 
-        return options
+        # setup max values
+        max_val = float('-inf')
+
+        # find best move for black
+        for board in MinMax.getBoards(logic, white):
+
+            # copy black and white pieces
+            temp_black = copy.deepcopy(black)
+            temp_white = copy.deepcopy(white)
+
+            if MinMax.checkEndGame(black, white) != 1:
+                return MinMax.checkEndGame(black, white)
+
+            piece_pos = board[1][1]
+
+            # check for capture
+            if logic[piece_pos[0], piece_pos[1]] is not None:
+                black, white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+
+            value = MinMax.getMin(board[0], temp_black, temp_white, depth + 1) - MinMax.evaluation_val(black, white, logic)
+            if value > max_val:
+                max_val = value
+
+        return max_val
 
     @staticmethod
-    # learns given path
-    def learn_move(move, last_val):
-        memories = open("memories1.json", "r+")
-        data = json.load(memories)
+    def getMin(logic, black, white, depth):
 
-        line = move
-        val = 0.1
+        # check for max depth
+        if depth == 3:
+            return -1*MinMax.evaluation_val(black, white, logic)
 
-        if line not in data:
+        # setup mon values
+        min_val = float('inf')
+
+        # find worst move for black
+        for board in MinMax.getBoards(logic, black):
+
+            # copy black and white pieces
+            temp_black = copy.deepcopy(black)
+            temp_white = copy.deepcopy(white)
+
+            if MinMax.checkEndGame(black, white) != 1:
+                return MinMax.checkEndGame(black, white)
+
+            piece_pos = board[1][1]
+
+            # check for capture
+            if logic[piece_pos[0], piece_pos[1]] is not None:
+                temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+
+            value = MinMax.getMax(board[0], temp_black, temp_white, depth + 1) - MinMax.evaluation_val(black, white, logic)
+            if value < min_val:
+                min_val = value
+
+        return min_val
+
+    @staticmethod
+    def deletePiece(black, white, captured):
+        if captured.isWhite:
+            white[captured.serialNum] = None
+        else:
+            black[captured.serialNum] = None
+        return black, white
+
+    # check for win or tie
+    @staticmethod
+    def checkEndGame(black,white):
+        # check for white win
+        endgame = 1
+        if str(black[4]) != "K0":
+            endgame = 9999
+        # check for black win
+        elif str(white[11]) != "K1":
+            endgame = -9999
+        # check for insufficient material
+        elif len(set(white + black)) <= 3:
+            endgame = 0
+
+        return endgame
+
+    # returns value of board
+    @staticmethod
+    def evaluation_val(black, white, logic):
+        return 0.7 * MinMax.sum_val(black, white) + 0.3 * MinMax.space_val(black, white, logic)
+
+    # returns the difference of black's and white's space
+    @staticmethod
+    def space_val(black, white, logic):
+        black_sum = 0
+        for piece in black:
+            if piece is not None:
+                black_sum += len(piece.getMoves(logic))
+
+        white_sum = 0
+        for piece in white:
+            if piece is not None:
+                white_sum += len(piece.getMoves(logic))
+
+        return black_sum - white_sum
+
+    # returns sum of pieces values
+    @staticmethod
+    def sum_val(black, white):
+        sum = 0
+        pieces = black + white
+        for piece in pieces:
+            if piece is not None:
+                sum += piece.value
+        return sum
+
+    @staticmethod
+    def printBoard(listLogicBoard):
+        for row in range(len(listLogicBoard)):
             print("")
-            print("--new move learned--")
-
-        value = val + 0.7 * (last_val - val)
-        print(value)
-
-        data[line] = value
-
-        memories.seek(0)
-        memories.truncate()
-
-        json.dump(data, memories)
-
-        return value
-
-    @staticmethod
-    # learns current route
-    def learn_route(route, endgame):
-        last = endgame * 999
-
-        while len(route) != 0:
-            move = route[len(route) - 1]
-
-            last = Rival.learn_move(move, last)
-
-            route.pop(len(route) - 1)
-
-    # returns the board in string form
-    @staticmethod
-    def boardToString(logic):
-        flat = logic.flatten()
-        result = ""
-        last = str(flat[0])
-        times = 0
-
-        for cell in flat:
-            if str(cell) == last:
-                times += 1
-            else:
-                if times != 1:
-                    result += last + str(times)
+            for col in range(len(listLogicBoard)):
+                square = listLogicBoard[row, col]
+                if square is None:
+                    print("--", end=" ")
                 else:
-                    result += last
-                last = str(cell)
-                times = 1
+                    print(square, end=" ")
+        print("")
 
-        return result
+    @staticmethod
+    def printLine(line):
+        for row in range(len(line)):
+            square = line[row]
+            if square is None:
+                print("--", end=" ")
+            else:
+                print(square, end=" ")
+        print("")
