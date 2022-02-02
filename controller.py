@@ -1,7 +1,8 @@
-import numpy as np
-import random
-from kivy.clock import Clock
 import copy
+
+import numpy as np
+from kivy.clock import Clock
+
 from Model import AFO
 from RBD import RBD
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
@@ -21,8 +22,7 @@ class Controller:  # keeps the logic board and rules of the game
 
         self.player = AFO()
 
-        self.routeW = []
-        self.routeB = []
+        self.route = []
 
     # input: the number of lines\cols
     # output: a logic board with every position set to 'empty'
@@ -131,7 +131,7 @@ class Controller:  # keeps the logic board and rules of the game
         self.parent.updateGraphBoard(old_pos, new_pos)
 
         # update player's board
-        self.player.update_board(old_pos,new_pos)
+        self.player.update_board(old_pos, new_pos)
 
         endgame = self.checkEndGame()
         if endgame == -999:
@@ -141,7 +141,7 @@ class Controller:  # keeps the logic board and rules of the game
 
         else:
             self.isGameOver = True
-            RBD.learn_route(self.routeB,endgame)
+            RBD.learn_route(self.routeB, endgame)
             self.parent.endGame(endgame)
             Clock.schedule_once(self.parent.restart, 1)
 
@@ -167,10 +167,10 @@ class Controller:  # keeps the logic board and rules of the game
     # update computer's turn
     def computer_turn(self, t1):
         if self.whiteTurn:
-            next_move = AFO.make_move(self.listLogicBoard,self.white)
+            next_move = self.player.make_move(self.listLogicBoard, self.black, self.white)
         else:
             next_move, next_val, key = RBD.make_move(self.listLogicBoard, self.black, self.white)
-            self.routeB.append([key, next_val])
+            self.route.append([key, next_val])
         self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen
@@ -179,7 +179,6 @@ class Controller:  # keeps the logic board and rules of the game
         if piece.type == "P" and (new[0] == 0 or new[0] == 7):  # upgrading time
             self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new, piece.serialNum)
             self.parent.upgrading_time(new)
-
 
     # move rook to position when castling
     def castle(self, king_pos):
@@ -190,17 +189,8 @@ class Controller:  # keeps the logic board and rules of the game
             old_pos = [king_pos[0], 7]
             new_pos = [king_pos[0], 5]
 
-        # update logic board
-        self.listLogicBoard[new_pos[0], new_pos[1]] = self.listLogicBoard[old_pos[0], old_pos[1]]
-        self.listLogicBoard[old_pos[0], old_pos[1]] = None
-
-        # update piece's first move
-        if self.listLogicBoard[new_pos[0], new_pos[1]].firstMove:
-            self.listLogicBoard[new_pos[0], new_pos[1]].firstMove = False
-
-        # update graph board
-        self.parent.updateGraphBoard(old_pos, new_pos)
-
+        self.logMove(old_pos, new_pos)
+        self.route.pop()
 
     # input: the captured piece
     # removes the piece from pieces array

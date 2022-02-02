@@ -1,21 +1,23 @@
 from stockfish import Stockfish
-<<<<<<< HEAD
 import random
-=======
 import copy
->>>>>>> final_boss
 
 
 class AFO:
 
     def __init__(self):
         self.engine = Stockfish(path="stockfishEngine/stockfish_14.1_win_x64_avx2.exe")
-<<<<<<< HEAD
-    # find best next move
-    def make_move(self, logic, white):
-        move = self.engine.get_best_move()
 
-        return self.code_to_positions(move)
+    # find best next move
+    def make_move(self, logic, black, white):
+        move = self.engine.get_best_move()
+        print(move)
+
+        positions = self.code_to_positions(move)
+        if positions is None:
+            return MinMax.make_move(logic, black, white)
+        else:
+            return positions
 
     def code_to_positions(self,code):
         moving = code[:2]
@@ -37,18 +39,6 @@ class AFO:
     def update_board(self,positions):
         move = self.positions_to_code(positions)
         self.engine.make_moves_from_current_position([move])
-=======
-
-    # find best next move
-    def make_move(self, logic,black, white):
-        move = self.engine.get_best_move()
-        print(move)
-
-        positions = self.code_to_positions(move)
-        if positions is None:
-            return MinMax.make_move(logic,black,white)
-        else:
-            return positions
 
     def code_to_positions(self,code):
         if code is None:
@@ -121,79 +111,15 @@ class MinMax:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = MinMax.getMin(board[0], temp_black, temp_white, 1) - MinMax.evaluation_val(black, white, logic)
+            value = MinMax.evaluation_val(black, white, logic)
 
             if MinMax.checkEndGame(black, white) != 1:
                 value = MinMax.checkEndGame(black, white)
 
-            if value > max_val:
+            if value < max_val:
                 max_val = value
                 max_piece = board[1]
         return max_piece
-
-    @staticmethod
-    def getMax(logic, black, white, depth):
-
-        # check for max depth
-        if depth == 3:
-            return -1*MinMax.evaluation_val(black, white, logic)
-
-        # setup max values
-        max_val = float('-inf')
-
-        # find best move for black
-        for board in MinMax.getBoards(logic, white):
-
-            # copy black and white pieces
-            temp_black = copy.deepcopy(black)
-            temp_white = copy.deepcopy(white)
-
-            if MinMax.checkEndGame(black, white) != 1:
-                return MinMax.checkEndGame(black, white)
-
-            piece_pos = board[1][1]
-
-            # check for capture
-            if logic[piece_pos[0], piece_pos[1]] is not None:
-                black, white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
-
-            value = MinMax.getMin(board[0], temp_black, temp_white, depth + 1) - MinMax.evaluation_val(black, white, logic)
-            if value > max_val:
-                max_val = value
-
-        return max_val
-
-    @staticmethod
-    def getMin(logic, black, white, depth):
-
-        # check for max depth
-        if depth == 3:
-            return -1*MinMax.evaluation_val(black, white, logic)
-
-        # setup mon values
-        min_val = float('inf')
-
-        # find worst move for black
-        for board in MinMax.getBoards(logic, black):
-
-            # copy black and white pieces
-            temp_black = copy.deepcopy(black)
-            temp_white = copy.deepcopy(white)
-
-            if MinMax.checkEndGame(black, white) != 1:
-                return MinMax.checkEndGame(black, white)
-
-            piece_pos = board[1][1]
-
-            # check for capture
-            if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
-
-            value = MinMax.getMax(board[0], temp_black, temp_white, depth + 1) - MinMax.evaluation_val(black, white, logic)
-            if value < min_val:
-                min_val = value
-
-        return min_val
 
     @staticmethod
     def deletePiece(black, white, captured):
@@ -209,10 +135,10 @@ class MinMax:
         # check for white win
         endgame = 1
         if str(black[4]) != "K0":
-            endgame = 9999
+            endgame = -9999
         # check for black win
         elif str(white[11]) != "K1":
-            endgame = -9999
+            endgame = 9999
         # check for insufficient material
         elif len(set(white + black)) <= 3:
             endgame = 0
@@ -270,4 +196,3 @@ class MinMax:
             else:
                 print(square, end=" ")
         print("")
->>>>>>> final_boss
