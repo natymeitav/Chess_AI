@@ -1,6 +1,5 @@
 import numpy as np
 import random
-
 from kivy.clock import Clock
 import copy
 from Model import AFO
@@ -20,7 +19,7 @@ class Controller:  # keeps the logic board and rules of the game
         self.parent = parent
         self.isGameOver = False
 
-        self.CPU_player = True
+        self.player = AFO()
 
         self.routeW = []
         self.routeB = []
@@ -109,6 +108,11 @@ class Controller:  # keeps the logic board and rules of the game
             captured = self.listLogicBoard[new_pos[0], new_pos[1]]
             self.DeletePiece(captured)
 
+        # check for castling
+        if piece.type == "K":
+            if piece.can_castle(new_pos, self.listLogicBoard):
+                self.castle(new_pos)
+
         # update logic board
         self.listLogicBoard[old_pos[0], old_pos[1]] = None
         self.listLogicBoard[new_pos[0], new_pos[1]] = piece
@@ -126,6 +130,9 @@ class Controller:  # keeps the logic board and rules of the game
         # update graph board
         self.parent.updateGraphBoard(old_pos, new_pos)
 
+        # update player's board
+        self.player.update_board(old_pos,new_pos)
+
         endgame = self.checkEndGame()
         if endgame == -999:
             # set up next turn
@@ -139,6 +146,7 @@ class Controller:  # keeps the logic board and rules of the game
             Clock.schedule_once(self.parent.restart, 1)
 
         # check for win or tie
+
     def checkEndGame(self):
         # check for white win
         endgame = -999
@@ -157,7 +165,7 @@ class Controller:  # keeps the logic board and rules of the game
         return endgame
 
     # update computer's turn
-    def computer_turn(self,t1):
+    def computer_turn(self, t1):
         if self.whiteTurn:
             next_move = AFO.make_move(self.listLogicBoard,self.white)
         else:
@@ -171,6 +179,28 @@ class Controller:  # keeps the logic board and rules of the game
         if piece.type == "P" and (new[0] == 0 or new[0] == 7):  # upgrading time
             self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new, piece.serialNum)
             self.parent.upgrading_time(new)
+
+
+    # move rook to position when castling
+    def castle(self, king_pos):
+        if king_pos[1] == 1:
+            old_pos = [king_pos[0], 0]
+            new_pos = [king_pos[0], 2]
+        else:
+            old_pos = [king_pos[0], 7]
+            new_pos = [king_pos[0], 5]
+
+        # update logic board
+        self.listLogicBoard[new_pos[0], new_pos[1]] = self.listLogicBoard[old_pos[0], old_pos[1]]
+        self.listLogicBoard[old_pos[0], old_pos[1]] = None
+
+        # update piece's first move
+        if self.listLogicBoard[new_pos[0], new_pos[1]].firstMove:
+            self.listLogicBoard[new_pos[0], new_pos[1]].firstMove = False
+
+        # update graph board
+        self.parent.updateGraphBoard(old_pos, new_pos)
+
 
     # input: the captured piece
     # removes the piece from pieces array
