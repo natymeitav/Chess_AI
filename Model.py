@@ -95,7 +95,7 @@ class MinMax:
     def make_move(logic, black, white):
 
         # setup max values
-        max_val = float('-inf')
+        max_val = float('inf')
         max_piece = None
 
         # find best move for black
@@ -111,10 +111,7 @@ class MinMax:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = MinMax.evaluation_val(black, white, logic)
-
-            if MinMax.checkEndGame(black, white) != 1:
-                value = MinMax.checkEndGame(black, white)
+            value = MinMax.checkEndGame(temp_black, temp_white)
 
             if value < max_val:
                 max_val = value
@@ -137,7 +134,7 @@ class MinMax:
         if str(black[4]) != "K0":
             endgame = -9999
         # check for black win
-        elif str(white[11]) != "K1":
+        elif str(white[12]) != "K1":
             endgame = 9999
         # check for insufficient material
         elif len(set(white + black)) <= 3:

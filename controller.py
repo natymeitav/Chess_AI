@@ -141,7 +141,7 @@ class Controller:  # keeps the logic board and rules of the game
 
         else:
             self.isGameOver = True
-            RBD.learn_route(self.routeB, endgame)
+            RBD.learn_route(self.route, endgame)
             self.parent.endGame(endgame)
             Clock.schedule_once(self.parent.restart, 1)
 
