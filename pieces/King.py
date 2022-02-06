@@ -1,5 +1,4 @@
 import numpy as np
-
 from Piece import Piece
 
 
@@ -24,10 +23,10 @@ class King(Piece):
                 if logic[rook_pos[0], rook_pos[1]] is not None:  # check if rook is in place
                     if logic[rook_pos[0], rook_pos[1]].firstMove and self.firstMove:  # check if rook and king didn't move
                         # check if path clear
-                        if rook_pos[1] > new[1]:
-                            return logic[new[0],5] is None
+                        if rook_pos[1] > self.pos[1]:
+                            return np.all(logic[self.pos[0], self.pos[1] + 1:rook_pos[1]] == None)
                         else:
-                            return logic[new[0], 3] is None and logic[new[0], 2] is None
+                            return np.all(logic[self.pos[0], rook_pos[1] + 1:self.pos[1]] == None)
         return False
 
     # returns all potential moves
@@ -46,7 +45,7 @@ class King(Piece):
         if self.can_castle([self.pos[0],1],logicBoard):
             moves.append([self.pos[0],1])
         if self.can_castle([self.pos[0],6],logicBoard):
-            moves.append([self.pos[0],1])
+            moves.append([self.pos[0],6])
 
         return moves
 

@@ -91,9 +91,6 @@ class Learner:
                 value = endgame
             elif value == -9999:
                 value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
-                print("a: "+str(value))
-            else:
-                print("b: "+str(value))
 
             #print(value)
 

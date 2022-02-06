@@ -91,10 +91,7 @@ class RBD:
 
             if value == -9999:
                 # depth = input + 2
-                value = MinMax.getMin(board[0],temp_black,temp_white,0)+Evaluations.evaluation_val(temp_black,temp_white,board[0])
-            #    print("a: "+str(value))
-            #else:
-            #    print("b: " + str(value))
+                value = MinMax.getMin(board[0],temp_black,temp_white,1)+Evaluations.evaluation_val(temp_black,temp_white,board[0])
 
             if value > max_val:
                 max_val = value
