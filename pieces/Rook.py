@@ -4,9 +4,9 @@ from Piece import Piece
 
 
 class Rook(Piece):
-    def __init__(self, isWhite, pos):
-        Piece.__init__(self, isWhite, pos, "R")
-        self.value = 50 + 100 * (self.isWhite - 1)
+    def __init__(self, isWhite, pos, serial):
+        Piece.__init__(self, isWhite, pos, "R", serial)
+        self.value = 50 - 100 * (self.isWhite)
 
     # check if rook can perform move
     def canMakeMove(self, new, logicBoard):
@@ -28,6 +28,37 @@ class Rook(Piece):
 
         return False
 
-    # returns all potential positions
+    # returns all potential moves
     def getMoves(self, logicBoard):
-        return []
+        return self.getMovesLine(logicBoard, 0) + self.getMovesLine(logicBoard, -1)
+
+    # returns the potential moves on diagonal by direction (0 --> col -1 --> row)
+    def getMovesLine(self, logicBoard, direction):
+        moves = []
+        # moves over rook
+        row = self.pos[0] - direction
+        col = self.pos[1] - (direction + 1)
+
+        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
+            moves.append((row, col))
+            row -= direction
+            col -= (direction + 1)
+
+        if -1 < row < 8 and -1 < col < 8:
+            if logicBoard[row, col].isWhite != self.isWhite:
+                moves.append((row, col))
+
+        # moves under rook
+        row = self.pos[0] + direction
+        col = self.pos[1] + (direction + 1)
+
+        while (-1 < row < 8 and -1 < col < 8) and logicBoard[row, col] is None:
+            moves.append((row, col))
+            row += direction
+            col += (direction + 1)
+
+        if -1 < row < 8 and -1 < col < 8:
+            if logicBoard[row, col].isWhite != self.isWhite:
+                moves.append((row, col))
+
+        return moves
