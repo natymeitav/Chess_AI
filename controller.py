@@ -1,5 +1,4 @@
 import copy
-
 import numpy as np
 from kivy.clock import Clock
 
@@ -20,7 +19,7 @@ class Controller:  # keeps the logic board and rules of the game
         self.parent = parent
         self.isGameOver = False
 
-        self.player = AFO()
+        self.player = AFO(self)
 
         self.route = []
 
@@ -140,13 +139,15 @@ class Controller:  # keeps the logic board and rules of the game
             Clock.schedule_once(self.computer_turn, 1)
 
         else:
-            self.isGameOver = True
-            RBD.learn_route(self.route, endgame)
-            self.parent.endGame(endgame)
-            Clock.schedule_once(self.parent.restart, 1)
+            self.endgame(endgame)
 
-        # check for win or tie
+    def endgame(self, endgame):
+        self.isGameOver = True
+        RBD.learn_route(self.route, endgame)
+        self.parent.endGame(endgame)
+        Clock.schedule_once(self.parent.restart, 1)
 
+    # check for win or tie
     def checkEndGame(self):
         # check for white win
         endgame = -999
