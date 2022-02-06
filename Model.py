@@ -1,5 +1,5 @@
 import copy
-
+import json
 
 class CPU:
 
@@ -55,7 +55,7 @@ class CPU:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, 1) + CPU.evaluation_val(black,white,logic)
+            value = CPU.getMin(board[0], temp_black, temp_white, 1) + CPU.evaluation_val(black, white, False)
             print(value)
             if value > max_val:
                 max_val = value
@@ -67,7 +67,7 @@ class CPU:
 
         # check for max depth
         if depth == 2:
-            return CPU.evaluation_val(black,white,logic)
+            return 0
 
         # setup max values
         max_val = float('-inf')
@@ -89,7 +89,7 @@ class CPU:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white,logic)
+            value = CPU.getMin(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black, white, False)
             if value > max_val:
                 max_val = value
 
@@ -100,7 +100,7 @@ class CPU:
 
         # check for max depth
         if depth == 2:
-            return CPU.evaluation_val(black,white,logic)
+            return 0
 
         # setup mon values
         min_val = float('inf')
@@ -122,7 +122,7 @@ class CPU:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMax(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white,logic)
+            value = CPU.getMax(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black, white, True)
             if value < min_val:
                 min_val = value
 
@@ -138,28 +138,29 @@ class CPU:
 
     # returns value of board
     @staticmethod
-    def evaluation_val(black,white,logic):
-        return 0.7*CPU.sum_val(black,white)+0.3*CPU.space_val(black,white,logic)
+    def evaluation_val(black, white, iswhite):
+        sum_val = 0.7 * CPU.sum_val(black, white)
+        if iswhite:
+            return sum_val - 0.3 * CPU.position_val(white)
+        else:
+            return sum_val + 0.3 * CPU.position_val(black)
 
-    # returns the difference of black's and white's space
+    # returns the sum of pieces's position value
     @staticmethod
-    def space_val(black,white,logic):
-        black_sum = 0
-        for piece in black:
+    def position_val(pieces):
+        maps_file = open("maps.json", "r+")
+        sum = 0
+        for piece in pieces:
             if piece is not None:
-                black_sum += len(piece.getMoves(logic))
+                position = piece.pos
+                score_board = json.load(maps_file)[piece.type]
+                sum += score_board[position[0],position[1]]
 
-        white_sum = 0
-        for piece in white:
-            if piece is not None:
-                white_sum += len(piece.getMoves(logic))
-
-        return black_sum - white_sum
-
+        return sum
 
     # returns sum of pieces values
     @staticmethod
-    def sum_val(black,white):
+    def sum_val(black, white):
         sum = 0
         pieces = black + white
         for piece in pieces:
