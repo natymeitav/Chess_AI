@@ -1,6 +1,5 @@
 import copy
 
-
 class CPU:
 
     # return array of posible moves [board,[position before, position after]]
@@ -34,20 +33,21 @@ class CPU:
     @staticmethod
     def makeMove(logic, black, white):
 
-        # setup max values
+        # setup values
+        alpha = float('-inf')
+        beta = float('inf')
+        boards = CPU.getBoards(logic, black)
+        max_piece = boards[0][1]
         max_val = float('-inf')
-        max_piece = None
 
         # find best move for black
-        for board in CPU.getBoards(logic, black):
-
+        for board in boards:
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
             if CPU.checkEndGame(temp_black, temp_white):
-                print("tie")
-                return 0
+                return CPU.checkEndGame(temp_black, temp_white)
 
             piece_pos = board[1][1]
 
@@ -55,19 +55,26 @@ class CPU:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, 1) + CPU.evaluation_val(black,white,logic)
+            value = CPU.getMin(board[0],black,white, 2,alpha,beta) + CPU.evaluation_val(temp_black,temp_white,board[0])
             print(value)
+
             if value > max_val:
                 max_val = value
                 max_piece = board[1]
+
+                if alpha < max_val:
+                    alpha = max_val
+                    if beta <= alpha:
+                        break
+
         return max_piece
 
     @staticmethod
-    def getMax(logic, black, white, depth):
+    def getMax(logic, black, white, depth, alpha, beta):
 
         # check for max depth
-        if depth == 2:
-            return CPU.evaluation_val(black,white,logic)
+        if depth == 0:
+            return 0
 
         # setup max values
         max_val = float('-inf')
@@ -80,8 +87,7 @@ class CPU:
             temp_white = copy.deepcopy(white)
 
             if CPU.checkEndGame(temp_black, temp_white):
-                print("tie")
-                return 0
+                return CPU.checkEndGame(temp_black, temp_white)
 
             piece_pos = board[1][1]
 
@@ -89,18 +95,22 @@ class CPU:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMin(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white,logic)
+            value = CPU.getMin(board[0], temp_black, temp_white, depth-1,alpha,beta) + CPU.evaluation_val(temp_black,temp_white,board[0])
             if value > max_val:
                 max_val = value
+                if alpha < max_val:
+                    alpha = max_val
+                    if beta <= alpha:
+                        break
 
         return max_val
 
     @staticmethod
-    def getMin(logic, black, white, depth):
+    def getMin(logic, black, white, depth, alpha, beta):
 
         # check for max depth
-        if depth == 2:
-            return CPU.evaluation_val(black,white,logic)
+        if depth == 0:
+            return 0
 
         # setup mon values
         min_val = float('inf')
@@ -113,8 +123,7 @@ class CPU:
             temp_white = copy.deepcopy(white)
 
             if CPU.checkEndGame(temp_black, temp_white):
-                print("tie")
-                return 0
+                return CPU.checkEndGame(temp_black, temp_white)
 
             piece_pos = board[1][1]
 
@@ -122,9 +131,13 @@ class CPU:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = CPU.getMax(board[0], temp_black, temp_white, depth + 1) + CPU.evaluation_val(black,white,logic)
+            value = CPU.getMax(board[0],temp_black,temp_white,depth-1,alpha,beta) + CPU.evaluation_val(temp_black,temp_white,board[0])
             if value < min_val:
                 min_val = value
+                if beta > min_val:
+                    beta = min_val
+                    if beta <= alpha:
+                        break
 
         return min_val
 
