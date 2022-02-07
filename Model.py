@@ -45,7 +45,7 @@ class CPU:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if CPU.checkTie(temp_black, temp_white):
+            if CPU.checkEndGame(temp_black, temp_white):
                 print("tie")
                 return 0
 
@@ -79,7 +79,7 @@ class CPU:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if CPU.checkTie(temp_black, temp_white):
+            if CPU.checkEndGame(temp_black, temp_white):
                 print("tie")
                 return 0
 
@@ -112,7 +112,7 @@ class CPU:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if CPU.checkTie(temp_black, temp_white):
+            if CPU.checkEndGame(temp_black, temp_white):
                 print("tie")
                 return 0
 
@@ -167,10 +167,19 @@ class CPU:
                 sum += piece.value
         return sum
 
-    # check for tie
+    # check for endgame
     @staticmethod
-    def checkTie(black, white):
-        return len(set(white + black)) == 3
+    def checkEndGame(black, white):
+        # check for white win
+        if str(black[4]) != "K0":
+            return 999
+        # check for black win
+        elif str(white[12]) != "K1":
+            return -999
+        # check for insufficient material
+        elif len(set(white + black)) == 3:
+            return 0
+
 
     @staticmethod
     def printBoard(listLogicBoard):
