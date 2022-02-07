@@ -66,41 +66,45 @@ class RBD:
     @staticmethod
     def make_move(logic, black, white):
 
-        # setup max values
+        # setup values
+        alpha = float('-inf')
+        beta = float('inf')
+        boards = RBD.getBoards(logic, black)
+        max_board = boards[0][1]
         max_val = float('-inf')
-        max_board = None
 
         # find best move for black
-        for board in RBD.getBoards(logic, black):
-
+        for board in boards:
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
+
+            if MinMax.checkEndGame(temp_black, temp_white):
+                return MinMax.checkEndGame(temp_black, temp_white)
 
             piece_pos = board[1][1]
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
-
-            endgame = MinMax.checkEndGame(temp_black, temp_white)
-            if endgame != 1:
-                return board[1], endgame, RBD.boardToString(board[0])
+                temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white,
+                                                            logic[piece_pos[0], piece_pos[1]])
 
             value = RBD.get_past_val(RBD.boardToString(board[0]))
-
             if value == -9999:
-                # depth = input + 2
-                value = MinMax.getMin(board[0],temp_black,temp_white,1)+Evaluations.evaluation_val(temp_black,temp_white,board[0])
-                print("a: "+str(value))
-            else:
-                print("b: " + str(value))
+                value = MinMax.getMin(board[0], black, white, 2, alpha, beta) + Evaluations.evaluation_val(temp_black,
+                                                                                                           temp_white,
+                                                                                                       board[0])
+            print(value)
 
             if value > max_val:
                 max_val = value
                 max_board = board
 
-        print("max_val: "+ str(max_val))
+                if alpha < max_val:
+                    alpha = max_val
+                    if beta <= alpha:
+                        break
+
         return max_board[1], max_val, RBD.boardToString(max_board[0])
 
     # ge t value of move from memories
@@ -196,21 +200,23 @@ class RBD:
 class MinMax:
 
     @staticmethod
-    def getMax(logic, black, white, depth):
+    def getMax(logic, black, white, depth, alpha, beta):
 
         # check for max depth
         if depth == 0:
-            return Evaluations.evaluation_val(black, white, logic)
+            return 0
 
         # setup max values
         max_val = float('-inf')
 
         # find best move for black
         for board in RBD.getBoards(logic, black):
-
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
+
+            if MinMax.checkEndGame(temp_black, temp_white):
+                return MinMax.checkEndGame(temp_black, temp_white)
 
             piece_pos = board[1][1]
 
@@ -218,22 +224,26 @@ class MinMax:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            endgame = MinMax.checkEndGame(temp_black, temp_white)
-            if endgame != 1:
-                return endgame
-
-            value = MinMax.getMin(board[0], temp_black, temp_white, depth - 1) + Evaluations.evaluation_val(black, white, logic)
+            value = RBD.get_past_val(RBD.boardToString(board[0]))
+            if value == -9999:
+                value = MinMax.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta) + Evaluations.evaluation_val(temp_black,
+                                                                                                           temp_white,
+                                                                                                           board[0])
             if value > max_val:
                 max_val = value
+                if alpha < max_val:
+                    alpha = max_val
+                    if beta <= alpha:
+                        break
 
         return max_val
 
     @staticmethod
-    def getMin(logic, black, white, depth):
+    def getMin(logic, black, white, depth, alpha, beta):
 
         # check for max depth
         if depth == 0:
-            return Evaluations.evaluation_val(black, white, logic)
+            return 0
 
         # setup mon values
         min_val = float('inf')
@@ -245,19 +255,26 @@ class MinMax:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
+            if MinMax.checkEndGame(temp_black, temp_white):
+                return MinMax.checkEndGame(temp_black, temp_white)
+
             piece_pos = board[1][1]
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            endgame = MinMax.checkEndGame(temp_black, temp_white)
-            if endgame != 1:
-                return endgame
-
-            value = MinMax.getMax(board[0], temp_black, temp_white, depth - 1) + Evaluations.evaluation_val(black, white, logic)
+            value = RBD.get_past_val(RBD.boardToString(board[0]))
+            if value == -9999:
+                value = MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta) + Evaluations.evaluation_val(temp_black,
+                                                                                                           temp_white,
+                                                                                                           board[0])
             if value < min_val:
                 min_val = value
+                if beta > min_val:
+                    beta = min_val
+                    if beta <= alpha:
+                        break
 
         return min_val
 
@@ -269,20 +286,18 @@ class MinMax:
             black[captured.serialNum] = None
         return black, white
 
-    # check for win or tie
+    # check for endgame
     @staticmethod
     def checkEndGame(black, white):
         # check for white win
-        endgame = 1
         if str(black[4]) != "K0":
-            endgame = -999
+            return 999
         # check for black win
         elif str(white[12]) != "K1":
-            endgame = 999
+            return -999
         # check for insufficient material
         elif len(set(white + black)) == 3:
-            endgame = 0
-        return endgame
+            return 0
 
     @staticmethod
     def printBoard(listLogicBoard):
