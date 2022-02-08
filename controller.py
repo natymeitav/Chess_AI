@@ -3,7 +3,7 @@ import random
 
 from kivy.clock import Clock
 import copy
-from Model import RBD, Evaluations
+from Model import Talos
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
 
@@ -134,7 +134,7 @@ class Controller:  # keeps the logic board and rules of the game
 
         else:
             self.isGameOver = True
-            RBD.learn_route(self.route,endgame)
+            Talos.learn_route(self.route,endgame)
             self.parent.endGame(endgame)
 
     # checks if last board is occurred more than 3 times
@@ -175,7 +175,7 @@ class Controller:  # keeps the logic board and rules of the game
 
     # update computer's turn
     def computer_turn(self,t1):
-        next_move, next_val, key = RBD.make_move(self.listLogicBoard, self.black,self.white)
+        next_move, next_val, key = Talos.make_move(self.listLogicBoard, self.black,self.white)
         self.route.append([key, next_val])
         self.logMove(next_move[0], next_move[1])
 
