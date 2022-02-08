@@ -33,7 +33,7 @@ class Evaluations:
         return sum
 
 # learns and recalls moves
-class RBD:
+class Talos:
 
     # return array of posible moves [board,[position before, position after]]
     @staticmethod
@@ -69,7 +69,7 @@ class RBD:
         # setup values
         alpha = float('-inf')
         beta = float('inf')
-        boards = RBD.getBoards(logic, black)
+        boards = Talos.getBoards(logic, black)
         max_board = boards[0][1]
         max_val = float('-inf')
 
@@ -89,7 +89,7 @@ class RBD:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white,
                                                             logic[piece_pos[0], piece_pos[1]])
 
-            value = RBD.get_past_val(RBD.boardToString(board[0]))
+            value = Talos.get_past_val(Talos.boardToString(board[0]))
             if value == -9999:
                 value = MinMax.getMin(board[0], black, white, 2, alpha, beta) + Evaluations.evaluation_val(temp_black,
                                                                                                            temp_white,
@@ -105,7 +105,7 @@ class RBD:
                     if beta <= alpha:
                         break
 
-        return max_board[1], max_val, RBD.boardToString(max_board[0])
+        return max_board[1], max_val, Talos.boardToString(max_board[0])
 
     # ge t value of move from memories
     @staticmethod
@@ -128,7 +128,7 @@ class RBD:
         data = json.load(memories)
 
         line, evaluation = move
-        val = RBD.get_past_val(line)
+        val = Talos.get_past_val(line)
 
         if line not in data:
             print("")
@@ -157,7 +157,7 @@ class RBD:
         while len(route) != 0:
             move = route[len(route) - 1]
 
-            last = RBD.learn_move(move, last)
+            last = Talos.learn_move(move, last)
 
             route.pop(len(route) - 1)
 
@@ -208,9 +208,10 @@ class MinMax:
 
         # setup max values
         max_val = float('-inf')
+        RBD = False
 
         # find best move for black
-        for board in RBD.getBoards(logic, black):
+        for board in Talos.getBoards(logic, black):
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
@@ -224,11 +225,14 @@ class MinMax:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = RBD.get_past_val(RBD.boardToString(board[0]))
+            value = Talos.get_past_val(Talos.boardToString(board[0]))
             if value == -9999:
-                value = MinMax.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta) + Evaluations.evaluation_val(temp_black,
-                                                                                                           temp_white,
-                                                                                                           board[0])
+                value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
+                if not RBD:
+                    value += MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+            else:
+                RBD = True
+
             if value > max_val:
                 max_val = value
                 if alpha < max_val:
@@ -247,9 +251,10 @@ class MinMax:
 
         # setup mon values
         min_val = float('inf')
+        RBD = False
 
         # find worst move for black
-        for board in RBD.getBoards(logic, white):
+        for board in Talos.getBoards(logic, white):
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
@@ -264,11 +269,14 @@ class MinMax:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            value = RBD.get_past_val(RBD.boardToString(board[0]))
+            value = Talos.get_past_val(Talos.boardToString(board[0]))
             if value == -9999:
-                value = MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta) + Evaluations.evaluation_val(temp_black,
-                                                                                                           temp_white,
-                                                                                                           board[0])
+                value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
+                if not RBD:
+                    value += MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+            else:
+                RBD = True
+
             if value < min_val:
                 min_val = value
                 if beta > min_val:
