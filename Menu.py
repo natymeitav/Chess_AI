@@ -13,7 +13,7 @@ class Menu(Layout):
     def __init__(self):
         Layout.__init__(self)
 
-        self.title = Label(text="RANDOM CHESS")
+        self.title = Label(text="Check, Mate")
         self.title.font_size = 80
         self.title.pos = (360, 680)
         self.title.color = [0, 0, 0, 1]
@@ -26,13 +26,46 @@ class Menu(Layout):
         self.startB.bind(on_press=self.start)
         self.add_widget(self.startB)
 
-        self.difficulty = Slider(min=0, max=4, value=2, orientation='vertical')
+        # difficulty bar
+
+        self.difficulty = Slider(min=0, max=3, value=2, orientation='vertical')
         self.difficulty.size = (100,500)
         self.difficulty.pos = (50, 80)
         self.difficulty.step = 1
         self.difficulty.value_track = 1000
         self.difficulty.value_track_color=[1, 0, 0, 1]
         self.add_widget(self.difficulty)
+
+        self.depth = Label(text="MAX DEPTH")
+        self.depth.font_size = 27
+        self.depth.pos = (55, 570)
+        self.depth.color = [0, 0, 0, 1]
+        self.add_widget(self.depth)
+
+        self.mark3 = Label(text="- Quantum computer")
+        self.mark3.font_size = 27
+        self.mark3.pos = (200, 517)
+        self.mark3.color = [0, 0, 0, 1]
+        self.add_widget(self.mark3)
+
+        self.mark2 = Label(text="- PC")
+        self.mark2.font_size = 27
+        self.mark2.pos = (100, 360)
+        self.mark2.color = [0, 0, 0, 1]
+        self.add_widget(self.mark2)
+
+        self.mark1 = Label(text="- calculator")
+        self.mark1.font_size = 27
+        self.mark1.pos = (140, 204)
+        self.mark1.color = [0, 0, 0, 1]
+        self.add_widget(self.mark1)
+
+        self.mark0 = Label(text="- microwave")
+        self.mark0.font_size = 27
+        self.mark0.pos = (145, 50)
+        self.mark0.color = [0, 0, 0, 1]
+        self.add_widget(self.mark0)
+
 
 
     def start(self, b1):
