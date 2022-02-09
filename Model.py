@@ -91,7 +91,7 @@ class Talos:
 
             value = Talos.get_past_val(Talos.boardToString(board[0]))
             if value == -9999:
-                value = MinMax.getMin(board[0], black, white, 2, alpha, beta) + Evaluations.evaluation_val(temp_black,
+                value = MinMax.getMin(board[0], black, white, 1, alpha, beta) + Evaluations.evaluation_val(temp_black,
                                                                                                            temp_white,
                                                                                                        board[0])
             print(value)
@@ -208,7 +208,7 @@ class MinMax:
 
         # setup max values
         max_val = float('-inf')
-        RBD = False
+        RBD = Talos.get_past_val(Talos.boardToString(logic)) != -9999
 
         # find best move for black
         for board in Talos.getBoards(logic, black):
@@ -230,8 +230,6 @@ class MinMax:
                 value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
                 if not RBD:
                     value += MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
-            else:
-                RBD = True
 
             if value > max_val:
                 max_val = value
@@ -251,7 +249,7 @@ class MinMax:
 
         # setup mon values
         min_val = float('inf')
-        RBD = False
+        RBD = Talos.get_past_val(Talos.boardToString(logic)) != -9999
 
         # find worst move for black
         for board in Talos.getBoards(logic, white):
@@ -274,8 +272,6 @@ class MinMax:
                 value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
                 if not RBD:
                     value += MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
-            else:
-                RBD = True
 
             if value < min_val:
                 min_val = value
