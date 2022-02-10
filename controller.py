@@ -171,7 +171,7 @@ class Controller:  # keeps the logic board and rules of the game
             print("--black wins--")
             endgame = 1
         # check for insufficient material
-        elif len(set(self.white + self.black)) == 3:
+        elif len(set(self.white + self.black)) == 4:
             print("--insufficient material--")
             endgame = 0
         # check for repeated action

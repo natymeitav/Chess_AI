@@ -295,12 +295,12 @@ class MinMax:
     def checkEndGame(black, white):
         # check for white win
         if str(black[4]) != "K0":
-            return 999
+            return -999
         # check for black win
         elif str(white[12]) != "K1":
-            return -999
+            return 999
         # check for insufficient material
-        elif len(set(white + black)) == 3:
+        elif len(set(white + black)) == 4:
             return 0
 
     @staticmethod
