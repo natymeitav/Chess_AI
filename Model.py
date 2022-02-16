@@ -94,7 +94,6 @@ class Talos:
                 value = MinMax.getMin(board[0], black, white, 1, alpha, beta) + Evaluations.evaluation_val(temp_black,
                                                                                                            temp_white,
                                                                                                        board[0])
-            print(value)
 
             if value > max_val:
                 max_val = value
@@ -105,6 +104,7 @@ class Talos:
                     if beta <= alpha:
                         break
 
+        print(str(max_board[1][1])+" "+str(max_val))
         return max_board[1], max_val, Talos.boardToString(max_board[0])
 
     # ge t value of move from memories
@@ -193,6 +193,10 @@ class Talos:
                 else:
                     print(square, end=" ")
         print("")
+    @staticmethod
+    def positions_to_code(piece, target):
+        target = (target[0]+1,target[1]+1)
+        return piece + str(target)
 
 
 

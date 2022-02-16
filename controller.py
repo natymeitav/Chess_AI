@@ -14,7 +14,6 @@ class Controller:  # keeps the logic board and rules of the game
         self.white = []  # white pieces
 
         self.listLogicBoard = self.buildLogicBoard(cols)
-        self.printBoard()
         self.whiteTurn = True
         self.parent = parent
         self.isGameOver = False
@@ -121,8 +120,6 @@ class Controller:  # keeps the logic board and rules of the game
 
         # update graph board
         self.parent.updateGraphBoard(old_pos, new_pos)
-
-        self.printBoard()
 
         # update route
         key = Talos.boardToString(self.listLogicBoard)
