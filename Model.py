@@ -229,7 +229,7 @@ class MinMax:
             if value == -9999:
                 value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
                 if not RBD:
-                    value += MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+                    value += MinMax.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
 
             if value > max_val:
                 max_val = value
