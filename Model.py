@@ -94,7 +94,8 @@ class Talos:
                 value = MinMax.getMin(board[0], black, white, 1, alpha, beta) + Evaluations.evaluation_val(temp_black,
                                                                                                            temp_white,
                                                                                                        board[0])
-            print(value)
+
+            print(Talos.positions_to_code(board[0][piece_pos[0]][piece_pos[1]].type,piece_pos)+" "+str(value))
 
             if value > max_val:
                 max_val = value
@@ -193,6 +194,10 @@ class Talos:
                 else:
                     print(square, end=" ")
         print("")
+    @staticmethod
+    def positions_to_code(piece, target):
+        target = (target[0]+1,target[1]+1)
+        return piece + str(target)
 
 
 
