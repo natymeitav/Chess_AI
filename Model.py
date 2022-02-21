@@ -226,9 +226,7 @@ class MinMax:
             if MinMax.checkEndGame(temp_black, temp_white):
                 return MinMax.checkEndGame(temp_black, temp_white)
 
-            value = Talos.get_past_val(Talos.boardToString(board[0]))
-            if value == -9999:
-                value = MinMax.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+            value = MinMax.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
 
             if value > max_val:
                 max_val = value
@@ -264,9 +262,7 @@ class MinMax:
             if MinMax.checkEndGame(temp_black, temp_white):
                 return MinMax.checkEndGame(temp_black, temp_white)
 
-            value = Talos.get_past_val(Talos.boardToString(board[0]))
-            if value == -9999:
-                value = MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+            value = MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
 
             if value < min_val:
                 min_val = value
