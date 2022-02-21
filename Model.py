@@ -79,9 +79,6 @@ class Talos:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if MinMax.checkEndGame(temp_black, temp_white):
-                return MinMax.checkEndGame(temp_black, temp_white)
-
             piece_pos = board[1][1]
 
             # check for capture
@@ -89,16 +86,12 @@ class Talos:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white,
                                                             logic[piece_pos[0], piece_pos[1]])
 
-            value = Talos.get_past_val(Talos.boardToString(board[0]))
-            if value == -9999:
-                value = MinMax.getMin(board[0], black, white, 1, alpha, beta) + Evaluations.evaluation_val(temp_black,
-                                                                                                           temp_white,
-                                                                                                       board[0])
-<<<<<<< HEAD
-=======
-
-            print(Talos.positions_to_code(board[0][piece_pos[0]][piece_pos[1]].type,piece_pos)+" "+str(value))
->>>>>>> Learning_MinMax
+            if MinMax.checkEndGame(temp_black, temp_white):
+                value = MinMax.checkEndGame(temp_black, temp_white)
+            else:
+                value = Talos.get_past_val(Talos.boardToString(board[0]))
+                if value == -9999:
+                    value = MinMax.getMin(board[0], black, white, 1, alpha, beta)
 
             if value > max_val:
                 max_val = value
@@ -213,11 +206,10 @@ class MinMax:
 
         # check for max depth
         if depth == 0:
-            return 0
+            return Evaluations.evaluation_val(black,white,logic)
 
         # setup max values
         max_val = float('-inf')
-        RBD = Talos.get_past_val(Talos.boardToString(logic)) != -9999
 
         # find best move for black
         for board in Talos.getBoards(logic, black):
@@ -225,20 +217,18 @@ class MinMax:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if MinMax.checkEndGame(temp_black, temp_white):
-                return MinMax.checkEndGame(temp_black, temp_white)
-
             piece_pos = board[1][1]
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
+            if MinMax.checkEndGame(temp_black, temp_white):
+                return MinMax.checkEndGame(temp_black, temp_white)
+
             value = Talos.get_past_val(Talos.boardToString(board[0]))
             if value == -9999:
-                value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
-                if not RBD:
-                    value += MinMax.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+                value = MinMax.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
 
             if value > max_val:
                 max_val = value
@@ -254,11 +244,10 @@ class MinMax:
 
         # check for max depth
         if depth == 0:
-            return 0
+            return Evaluations.evaluation_val(black,white,logic)
 
         # setup mon values
         min_val = float('inf')
-        RBD = Talos.get_past_val(Talos.boardToString(logic)) != -9999
 
         # find worst move for black
         for board in Talos.getBoards(logic, white):
@@ -267,20 +256,17 @@ class MinMax:
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
-            if MinMax.checkEndGame(temp_black, temp_white):
-                return MinMax.checkEndGame(temp_black, temp_white)
-
             piece_pos = board[1][1]
-
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
+            if MinMax.checkEndGame(temp_black, temp_white):
+                return MinMax.checkEndGame(temp_black, temp_white)
+
             value = Talos.get_past_val(Talos.boardToString(board[0]))
             if value == -9999:
-                value = Evaluations.evaluation_val(temp_black,temp_white,board[0])
-                if not RBD:
-                    value += MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+                value = MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
 
             if value < min_val:
                 min_val = value
