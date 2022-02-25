@@ -1,6 +1,7 @@
 import copy
 import json
 
+
 # bot's heuristic functions
 class Evaluations:
     @staticmethod
@@ -31,6 +32,7 @@ class Evaluations:
             if piece is not None:
                 sum += piece.value
         return sum
+
 
 # learns and recalls moves
 class Talos:
@@ -86,12 +88,13 @@ class Talos:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white,
                                                             logic[piece_pos[0], piece_pos[1]])
 
-            if MinMax.checkEndGame(temp_black, temp_white):
-                value = MinMax.checkEndGame(temp_black, temp_white)
-            else:
-                value = Talos.get_past_val(Talos.boardToString(board[0]))
-                if value == -9999:
-                    value = MinMax.getMin(board[0], black, white, 1, alpha, beta)
+            value = Talos.get_past_val(Talos.boardToString(board[0]))
+            if value == -9999:
+                value = MinMax.getMin(board[0], black, white, 1, alpha, beta) + Evaluations.evaluation_val(temp_black,
+                                                                                                           temp_white,
+                                                                                                           board[0])
+
+            #print(Talos.positions_to_code(board[0][piece_pos[0]][piece_pos[1]].type, piece_pos) + " " + str(value))
 
             if value > max_val:
                 max_val = value
@@ -102,7 +105,7 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        print(str(max_board[1][1])+" "+str(max_val))
+        print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1], max_val, Talos.boardToString(max_board[0])
 
     # ge t value of move from memories
@@ -115,7 +118,7 @@ class Talos:
         if move in data.keys():
             memories.close()
             return data[move]
-        else: # move doesn't exist
+        else:  # move doesn't exist
             memories.close()
             return -9999
 
@@ -191,11 +194,11 @@ class Talos:
                 else:
                     print(square, end=" ")
         print("")
+
     @staticmethod
     def positions_to_code(piece, target):
-        target = (target[0]+1,target[1]+1)
+        target = (target[0] + 1, target[1] + 1)
         return piece + str(target)
-
 
 
 # calculates next Moves
@@ -223,8 +226,10 @@ class MinMax:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            if MinMax.checkEndGame(temp_black, temp_white):
-                return MinMax.checkEndGame(temp_black, temp_white)
+            value = Talos.get_past_val(Talos.boardToString(board[0]))
+            if value == -9999:
+                value = Evaluations.evaluation_val(temp_black, temp_white, board[0])
+                value += MinMax.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
 
             value = MinMax.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
 
@@ -259,8 +264,10 @@ class MinMax:
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = MinMax.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            if MinMax.checkEndGame(temp_black, temp_white):
-                return MinMax.checkEndGame(temp_black, temp_white)
+            value = Talos.get_past_val(Talos.boardToString(board[0]))
+            if value == -9999:
+                value = Evaluations.evaluation_val(temp_black, temp_white, board[0])
+                value += MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
 
             value = MinMax.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
 
