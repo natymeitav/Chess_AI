@@ -41,7 +41,7 @@ class CPU:
         max_board = boards[0][1]
         max_val = float('-inf')
 
-        boards = CPU.ordering(CPU.getBoards(logic, black), black, white, logic)
+        boards = CPU.ordering(CPU.getBoards(logic, black), black, white, logic,False)
 
         # find best move for black
         for board in boards:
@@ -54,12 +54,12 @@ class CPU:
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white,
-                                                            logic[piece_pos[0], piece_pos[1]])
+                                                         logic[piece_pos[0], piece_pos[1]])
 
             if CPU.checkEndGame(temp_black, temp_white):
                 value = CPU.checkEndGame(temp_black, temp_white)
             else:
-                value = CPU.getMin(board[0], black, white, 2, alpha, beta)
+                value = CPU.getMin(board[0], black, white, 1, alpha, beta)
 
             if value > max_val:
                 max_val = value
@@ -79,12 +79,15 @@ class CPU:
 
         # check for max depth
         if depth == 0:
+            CPU.printBoard(logic)
+            print(CPU.evaluation_val(black, white, logic))
+            print()
             return CPU.evaluation_val(black, white, logic)
 
         # setup max values
         max_val = float('-inf')
 
-        boards = CPU.ordering(CPU.getBoards(logic, black),black,white,logic)
+        boards = CPU.ordering(CPU.getBoards(logic, black), black, white, logic,False)
 
         # find best move for black
         for board in boards:
@@ -125,7 +128,7 @@ class CPU:
         # setup mon values
         min_val = float('inf')
 
-        boards = CPU.ordering(CPU.getBoards(logic, white),white,black,logic)
+        boards = CPU.ordering(CPU.getBoards(logic, white), white, black, logic,False)
 
         # find worst move for black
         for board in boards:
@@ -162,9 +165,9 @@ class CPU:
         return black, white
 
     @staticmethod
-    def ordering(boards, allys, enemies, logic):
+    def ordering(boards, allys, enemies, logic, isWhite):
         order = []
-        if allys[0].isWhite:
+        if isWhite:
             black = copy.deepcopy(enemies)
             white = copy.deepcopy(allys)
         else:
@@ -197,34 +200,44 @@ class CPU:
                         elif index == 1:
                             index = 0
 
-            order.insert(index,board)
+            order.insert(index, board)
 
         return order
 
     # returns value of board
     @staticmethod
     def evaluation_val(black, white, logic):
-        value_sum, space_sum = CPU.sum_val(black, white, logic)
-        return 0.7 * value_sum + 0.3 * space_sum
+        value_sum, space_sum, center_val = CPU.sum_val(black, white, logic)
+        return 0.7 * value_sum + 0.1 * space_sum + 0.2 * center_val
 
-    # returns sum of pieces values
+    # returns evaluation values
     @staticmethod
     def sum_val(black, white, logic):
         sum = 0
         moves_sum = 0
+        center_val = 0
         for piece in black:
             if piece is not None:
                 sum += piece.value
 
-                moves_sum += len(piece.getMoves(logic))
+                moves = piece.getMoves(logic)
+                moves_sum += len(moves)
+
+                # check center_control
+                if 2 <= piece.pos[0] <= 5 and 2 <= piece.pos[0] <= 5:
+                    center_val += piece.value
 
         for piece in white:
             if piece is not None:
                 sum += piece.value
 
-                moves_sum -= len(piece.getMoves(logic))
+                moves = piece.getMoves(logic)
+                moves_sum -= len(moves)
 
-        return sum, moves_sum
+                if 2 <= piece.pos[0] <= 5 and 2 <= piece.pos[0] <= 5:
+                    center_val -= piece.value
+
+        return sum, moves_sum, center_val
 
     # check for endgame
     @staticmethod

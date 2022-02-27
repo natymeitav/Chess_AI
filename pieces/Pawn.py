@@ -37,7 +37,7 @@ class Pawn(Piece):
         if logicBoard[self.pos[0] + coefficient, self.pos[1]] is None:
             moves.append((self.pos[0] + coefficient, self.pos[1]))
             if self.firstMove and logicBoard[self.pos[0] + coefficient * 2, self.pos[1]] is None:
-                moves.append((self.pos[0] + coefficient, self.pos[1]))
+                moves.append((self.pos[0] + coefficient*2, self.pos[1]))
 
         # capture moves
 
