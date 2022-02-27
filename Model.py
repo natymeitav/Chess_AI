@@ -1,5 +1,6 @@
 import copy
 
+
 class CPU:
 
     # return array of posible moves [board,[position before, position after]]
@@ -51,7 +52,7 @@ class CPU:
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = CPU.deletePiece(temp_black, temp_white,
-                                                            logic[piece_pos[0], piece_pos[1]])
+                                                         logic[piece_pos[0], piece_pos[1]])
 
             if CPU.checkEndGame(temp_black, temp_white):
                 value = CPU.checkEndGame(temp_black, temp_white)
@@ -67,7 +68,7 @@ class CPU:
                     if beta <= alpha:
                         break
 
-        print(str(max_board[1][1])+" "+str(max_val))
+        print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
     @staticmethod
@@ -111,7 +112,7 @@ class CPU:
 
         # check for max depth
         if depth == 0:
-            return CPU.evaluation_val(black,white,logic)
+            return CPU.evaluation_val(black, white, logic)
 
         # setup mon values
         min_val = float('inf')
@@ -152,28 +153,45 @@ class CPU:
 
     # returns value of board
     @staticmethod
-    def evaluation_val(black,white,logic):
-        value_sum, space_sum = CPU.sum_val(black,white,logic)
-        return 0.7*value_sum+0.3*space_sum
+    def evaluation_val(black, white, logic):
+        return CPU.sum_val(black, white, logic)
+
+    # counts the number of pieces that protect pos
+    @staticmethod
+    def protection_val(allys, pos, logic):
+        count = 0
+        for piece in allys:
+            if piece is not None:
+                if pos in piece.getMoves(logic):
+                    return True
+        return False
 
     # returns sum of pieces values
     @staticmethod
-    def sum_val(black,white,logic):
+    def sum_val(black, white, logic):
         sum = 0
-        moves_sum = 0
+        space_sum = 0
         for piece in black:
             if piece is not None:
                 sum += piece.value
 
-                moves_sum += len(piece.getMoves(logic))
+                space_sum += len(piece.getMoves(logic))
+
+                # check if piece is protected
+                #if CPU.protection_val(black, piece.pos, logic):
+                #    sum += piece.value
 
         for piece in white:
             if piece is not None:
                 sum += piece.value
 
-                moves_sum -= len(piece.getMoves(logic))
+                space_sum -= len(piece.getMoves(logic))
 
-        return sum, moves_sum
+                # check if piece is protected
+                #if CPU.protection_val(white, piece.pos, logic):
+                #    sum += piece.value
+
+        return sum + 0.5*space_sum
 
     # check for endgame
     @staticmethod
@@ -187,7 +205,6 @@ class CPU:
         # check for insufficient material
         elif len(set(white + black)) == 4:
             return 0
-
 
     @staticmethod
     def printBoard(listLogicBoard):
