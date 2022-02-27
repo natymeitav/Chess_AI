@@ -1,5 +1,6 @@
 import copy
 
+
 class CPU:
 
     # return array of posible moves [board,[position before, position after]]
@@ -40,6 +41,8 @@ class CPU:
         max_board = boards[0][1]
         max_val = float('-inf')
 
+        boards = CPU.ordering(CPU.getBoards(logic, black), black, white, logic)
+
         # find best move for black
         for board in boards:
             # copy black and white pieces
@@ -56,7 +59,7 @@ class CPU:
             if CPU.checkEndGame(temp_black, temp_white):
                 value = CPU.checkEndGame(temp_black, temp_white)
             else:
-                value = CPU.getMin(board[0], black, white, 1, alpha, beta)
+                value = CPU.getMin(board[0], black, white, 2, alpha, beta)
 
             if value > max_val:
                 max_val = value
@@ -67,7 +70,7 @@ class CPU:
                     if beta <= alpha:
                         break
 
-        print(str(max_board[1][1])+" "+str(max_val))
+        print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
     @staticmethod
@@ -80,8 +83,10 @@ class CPU:
         # setup max values
         max_val = float('-inf')
 
+        boards = CPU.ordering(CPU.getBoards(logic, black),black,white,logic)
+
         # find best move for black
-        for board in CPU.getBoards(logic, black):
+        for board in boards:
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
@@ -111,13 +116,15 @@ class CPU:
 
         # check for max depth
         if depth == 0:
-            return CPU.evaluation_val(black,white,logic)
+            return CPU.evaluation_val(black, white, logic)
 
         # setup mon values
         min_val = float('inf')
 
+        boards = CPU.ordering(CPU.getBoards(logic, white),white,black,logic)
+
         # find worst move for black
-        for board in CPU.getBoards(logic, white):
+        for board in boards:
 
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
@@ -150,15 +157,55 @@ class CPU:
             black[captured.serialNum] = None
         return black, white
 
+    @staticmethod
+    def ordering(boards, allys, enemies, logic):
+        order = []
+        if allys[0].isWhite:
+            black = copy.deepcopy(enemies)
+            white = copy.deepcopy(allys)
+        else:
+            black = copy.deepcopy(allys)
+            white = copy.deepcopy(enemies)
+
+        for board in boards:
+            index = -1
+
+            piece_pos = board[1][1]
+            # check for capture
+            if logic[piece_pos[0], piece_pos[1]] is not None:
+                black, white = CPU.deletePiece(black, white,
+                                               logic[piece_pos[0], piece_pos[1]])
+                index = 0
+
+            # check for dangerous position
+            for enemy in white:
+                if enemy is not None:
+                    if piece_pos in enemy.getMoves(board[0]):
+                        if len(order) - 1 > index:
+                            index += 1
+
+            # check for protection
+            for ally in black:
+                if ally is not None:
+                    if piece_pos in ally.getMoves(board[0]):
+                        if 1 < index:
+                            index -= 2
+                        elif index == 1:
+                            index = 0
+
+            order.insert(index,board)
+
+        return order
+
     # returns value of board
     @staticmethod
-    def evaluation_val(black,white,logic):
-        value_sum, space_sum = CPU.sum_val(black,white,logic)
-        return 0.7*value_sum+0.3*space_sum
+    def evaluation_val(black, white, logic):
+        value_sum, space_sum = CPU.sum_val(black, white, logic)
+        return 0.7 * value_sum + 0.3 * space_sum
 
     # returns sum of pieces values
     @staticmethod
-    def sum_val(black,white,logic):
+    def sum_val(black, white, logic):
         sum = 0
         moves_sum = 0
         for piece in black:
@@ -187,7 +234,6 @@ class CPU:
         # check for insufficient material
         elif len(set(white + black)) == 4:
             return 0
-
 
     @staticmethod
     def printBoard(listLogicBoard):
