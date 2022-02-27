@@ -88,7 +88,7 @@ class Board(GridLayout):  # Making a randomized chess board
             self.controller.listLogicBoard[new_pos[0], new_pos[1]]) + ".png"
 
     def upgrading_time(self, new):
-        self.listGraphBoard[new[0], new[1]].background_down = self.parent.listGraphBoard[
+        self.listGraphBoard[new[0], new[1]].background_down = self.listGraphBoard[
             new[0], new[1]].background_normal = "img/" + str(
             self.controller.listLogicBoard[new[0], new[1]]) + ".png"
 

@@ -56,7 +56,7 @@ class CPU:
             if CPU.checkEndGame(temp_black, temp_white):
                 value = CPU.checkEndGame(temp_black, temp_white)
             else:
-                value = CPU.getMin(board[0], black, white, 2, alpha, beta)
+                value = CPU.getMin(board[0], black, white, 1, alpha, beta)
 
             if value > max_val:
                 max_val = value
@@ -153,45 +153,27 @@ class CPU:
     # returns value of board
     @staticmethod
     def evaluation_val(black,white,logic):
-        return 0.7*CPU.sum_val(black,white,logic)+0.3*CPU.space_val(black,white,logic)
-
-    # returns the difference of black's and white's space
-    @staticmethod
-    def space_val(black,white,logic):
-        black_sum = 0
-        for piece in black:
-            if piece is not None:
-                black_sum += len(piece.getMoves(logic))
-
-        white_sum = 0
-        for piece in white:
-            if piece is not None:
-                white_sum += len(piece.getMoves(logic))
-
-        return black_sum - white_sum
-
-    # counts the number of pieces that protect pos
-    @staticmethod
-    def protection_val(allys,pos,logic):
-        count = 0
-        for piece in allys:
-            if piece is not None:
-                if pos in piece.getMoves(logic):
-                    count += 1
-        return count
+        value_sum, space_sum = CPU.sum_val(black,white,logic)
+        return 0.7*value_sum+0.3*space_sum
 
     # returns sum of pieces values
     @staticmethod
     def sum_val(black,white,logic):
         sum = 0
+        moves_sum = 0
         for piece in black:
             if piece is not None:
-                sum += piece.value*CPU.protection_val(black,piece.pos,logic)
+                sum += piece.value
+
+                moves_sum += len(piece.getMoves(logic))
 
         for piece in white:
             if piece is not None:
-                sum += piece.value*CPU.protection_val(white,piece.pos,logic)
-        return sum
+                sum += piece.value
+
+                moves_sum -= len(piece.getMoves(logic))
+
+        return sum, moves_sum
 
     # check for endgame
     @staticmethod
