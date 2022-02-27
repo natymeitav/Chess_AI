@@ -70,6 +70,7 @@ class CPU:
                     if beta <= alpha:
                         break
 
+        print("-----------------------------------------------------------------")
         print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
@@ -116,6 +117,9 @@ class CPU:
 
         # check for max depth
         if depth == 0:
+            CPU.printBoard(logic)
+            print(CPU.evaluation_val(black, white, logic))
+            print()
             return CPU.evaluation_val(black, white, logic)
 
         # setup mon values
