@@ -208,7 +208,7 @@ class CPU:
     @staticmethod
     def evaluation_val(black, white, logic):
         value_sum, space_sum, center_val = CPU.sum_val(black, white, logic)
-        return 0.7 * value_sum + 0.1 * space_sum + 0.2 * center_val
+        return 0.7 * value_sum + 0.1 * space_sum + 0.2 * center_val - 0.5*CPU.safety_val(black,white,logic)
 
     # returns evaluation values
     @staticmethod
@@ -224,8 +224,7 @@ class CPU:
                 moves_sum += len(moves)
 
                 # check center_control
-                if 2 <= piece.pos[0] <= 5 and 2 <= piece.pos[0] <= 5:
-                    center_val += piece.value
+                center_val += CPU.center_val(piece.pos,piece.value)
 
         for piece in white:
             if piece is not None:
@@ -234,10 +233,25 @@ class CPU:
                 moves = piece.getMoves(logic)
                 moves_sum -= len(moves)
 
-                if 2 <= piece.pos[0] <= 5 and 2 <= piece.pos[0] <= 5:
-                    center_val -= piece.value
+                # check center_control
+                center_val -= CPU.center_val(piece.pos,piece.value)
 
         return sum, moves_sum, center_val
+
+    # checks for control over the center
+    @staticmethod
+    def center_val(pos,val):
+        if 3 <= pos[0] <= 4 and 3 <= pos[0] <= 4:
+            return val
+        elif (pos[0] == 2 or pos[0] == 5) and (pos[1] == 2 or pos[0] == 5):
+            return val/2
+        else:
+            return 0
+
+    @staticmethod
+    def safety_val(black,white,logic):
+        return len(black[4].getMoves(logic)) - len(white[12].getMoves(logic))
+
 
     # check for endgame
     @staticmethod
