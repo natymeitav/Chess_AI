@@ -13,6 +13,7 @@ from controller import Controller
 
 # Better red a33721
 
+
 class Cell(Button):  # MAKE A BUTTON
     def __init__(self, row, col):
         Button.__init__(self)

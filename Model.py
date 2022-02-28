@@ -80,8 +80,7 @@ class CPU:
         # check for max depth
         if depth == 0:
             CPU.printBoard(logic)
-            print(CPU.evaluation_val(black, white, logic))
-            print()
+            print("VAL: "+str(CPU.evaluation_val(black, white, logic)),end = " ")
             return CPU.evaluation_val(black, white, logic)
 
         # setup max values
@@ -105,6 +104,7 @@ class CPU:
                 return CPU.checkEndGame(temp_black, temp_white)
 
             value = CPU.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+            print(piece_pos)
 
             if value > max_val:
                 max_val = value
@@ -113,6 +113,7 @@ class CPU:
                     if beta <= alpha:
                         break
 
+        print("MAX: " + str(max_val))
         return max_val
 
     @staticmethod
@@ -121,8 +122,7 @@ class CPU:
         # check for max depth
         if depth == 0:
             CPU.printBoard(logic)
-            print(CPU.evaluation_val(black, white, logic))
-            print()
+            print("VAL: "+str(CPU.evaluation_val(black, white, logic)),end = " ")
             return CPU.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -146,6 +146,7 @@ class CPU:
                 return CPU.checkEndGame(temp_black, temp_white)
 
             value = CPU.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+            print(piece_pos)
 
             if value < min_val:
                 min_val = value
@@ -154,6 +155,7 @@ class CPU:
                     if beta <= alpha:
                         break
 
+        print("MIN: " + str(min_val))
         return min_val
 
     @staticmethod
