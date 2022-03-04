@@ -1,15 +1,13 @@
 import copy
 
 
-class CPU:
+class Talos:
 
-    def __init__(self, pieces_im, space_im, capture_im, center_im, safety_im):
+    def __init__(self, pieces_im, space_im, center_im, safety_im):
         self.pieces_im = pieces_im
         self.space_im = space_im
-        self.capture_im = capture_im
         self.center_im = center_im
         self.saftey_im = safety_im
-
 
     # return array of posible moves [board,[position before, position after]]
     def getBoards(self, logic, pieces):
@@ -43,11 +41,11 @@ class CPU:
         # setup values
         alpha = float('-inf')
         beta = float('inf')
-        boards = CPU.getBoards(logic, black)
+        boards = self.getBoards(logic, black)
         max_board = boards[0][1]
         max_val = float('-inf')
 
-        boards = CPU.ordering(CPU.getBoards(logic, black), black, white, logic,False)
+        boards = self.ordering(self.getBoards(logic, black), black, white, logic, False)
 
         # find best move for black
         for board in boards:
@@ -59,13 +57,13 @@ class CPU:
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white = CPU.deletePiece(temp_black, temp_white,
-                                                         logic[piece_pos[0], piece_pos[1]])
+                temp_black, temp_white = self.deletePiece(temp_black, temp_white,
+                                                          logic[piece_pos[0], piece_pos[1]])
 
-            if CPU.checkEndGame(temp_black, temp_white):
-                value = CPU.checkEndGame(temp_black, temp_white)
+            if self.checkEndGame(temp_black, temp_white):
+                value = self.checkEndGame(temp_black, temp_white)
             else:
-                value = CPU.getMin(board[0], black, white, depth, alpha, beta)
+                value = self.getMin(board[0], black, white, depth, alpha, beta)
 
             if value > max_val:
                 max_val = value
@@ -80,19 +78,18 @@ class CPU:
         print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
-    @staticmethod
-    def getMin(logic, black, white, depth, alpha, beta):
+    def getMin(self, logic, black, white, depth, alpha, beta):
 
         # check for max depth
         if depth == 0:
-            CPU.printBoard(logic)
-            print("VAL: " + str(CPU.evaluation_val(black, white, logic)), end=" ")
-            return CPU.evaluation_val(black, white, logic)
+            self.printBoard(logic)
+            print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
+            return self.evaluation_val(black, white, logic)
 
         # setup mon values
         min_val = float('inf')
 
-        boards = CPU.ordering(CPU.getBoards(logic, white), white, black, logic, False)
+        boards = self.ordering(self.getBoards(logic, white), white, black, logic, False)
 
         # find worst move for black
         for board in boards:
@@ -104,12 +101,12 @@ class CPU:
             piece_pos = board[1][1]
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+                temp_black, temp_white = self.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            if CPU.checkEndGame(temp_black, temp_white):
-                return CPU.checkEndGame(temp_black, temp_white)
+            if self.checkEndGame(temp_black, temp_white):
+                return self.checkEndGame(temp_black, temp_white)
 
-            value = CPU.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+            value = self.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
             print(piece_pos)
 
             if value < min_val:
@@ -122,19 +119,18 @@ class CPU:
         print("MIN: " + str(min_val))
         return min_val
 
-    @staticmethod
-    def getMax(logic, black, white, depth, alpha, beta):
+    def getMax(self, logic, black, white, depth, alpha, beta):
 
         # check for max depth
         if depth == 0:
-            CPU.printBoard(logic)
-            print("VAL: "+str(CPU.evaluation_val(black, white, logic)),end = " ")
-            return CPU.evaluation_val(black, white, logic)
+            self.printBoard(logic)
+            print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
+            return self.evaluation_val(black, white, logic)
 
         # setup max values
         max_val = float('-inf')
 
-        boards = CPU.ordering(CPU.getBoards(logic, black), black, white, logic,False)
+        boards = self.ordering(self.getBoards(logic, black), black, white, logic, False)
 
         # find best move for black
         for board in boards:
@@ -146,12 +142,12 @@ class CPU:
 
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                temp_black, temp_white = CPU.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
+                temp_black, temp_white = self.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
 
-            if CPU.checkEndGame(temp_black, temp_white):
-                return CPU.checkEndGame(temp_black, temp_white)
+            if self.checkEndGame(temp_black, temp_white):
+                return self.checkEndGame(temp_black, temp_white)
 
-            value = CPU.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
+            value = self.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
             print(piece_pos)
 
             if value > max_val:
@@ -164,16 +160,14 @@ class CPU:
         print("MAX: " + str(max_val))
         return max_val
 
-    @staticmethod
-    def deletePiece(black, white, captured):
+    def deletePiece(self, black, white, captured):
         if captured.isWhite:
             white[captured.serialNum] = None
         else:
             black[captured.serialNum] = None
         return black, white
 
-    @staticmethod
-    def ordering(boards, allys, enemies, logic, isWhite):
+    def ordering(self, boards, allys, enemies, logic, isWhite):
         order = []
         if isWhite:
             black = copy.deepcopy(enemies)
@@ -188,8 +182,8 @@ class CPU:
             piece_pos = board[1][1]
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                black, white = CPU.deletePiece(black, white,
-                                               logic[piece_pos[0], piece_pos[1]])
+                black, white = self.deletePiece(black, white,
+                                                logic[piece_pos[0], piece_pos[1]])
                 index = 0
 
             # check for dangerous position
@@ -213,15 +207,13 @@ class CPU:
         return order
 
     # returns value of board
-    @staticmethod
-    def evaluation_val(black, white, logic):
-        value_sum, space_sum, center_val = CPU.sum_val(black, white, logic)
-        saftey_val = CPU.safety_val(black,white,logic)
-        return 0.7 * value_sum + 0.1 * space_sum + 0.2 * center_val - 0.6*saftey_val
+    def evaluation_val(self, black, white, logic):
+        value_sum, space_sum, center_val = self.sum_val(black, white, logic)
+        saftey_val = self.safety_val(black, white, logic)
+        return 1 * value_sum + 0.1 * space_sum + 0.2 * center_val - 0.6 * saftey_val
 
     # returns evaluation values
-    @staticmethod
-    def sum_val(black, white, logic):
+    def sum_val(self, black, white, logic):
         sum = 0
         moves_sum = 0
         center_val = 0
@@ -233,7 +225,7 @@ class CPU:
                 moves_sum += len(moves)
 
                 # check center_control
-                center_val += CPU.center_val(piece.pos,piece.value)
+                center_val += self.center_val(piece.pos, piece.value)
 
         for piece in white:
             if piece is not None:
@@ -243,28 +235,24 @@ class CPU:
                 moves_sum -= len(moves)
 
                 # check center_control
-                center_val -= CPU.center_val(piece.pos,piece.value)
+                center_val -= self.center_val(piece.pos, piece.value)
 
         return sum, moves_sum, center_val
 
     # checks for control over the center
-    @staticmethod
-    def center_val(pos,val):
+    def center_val(self, pos, val):
         if 3 <= pos[0] <= 4 and 3 <= pos[0] <= 4:
             return val
         elif (pos[0] == 2 or pos[0] == 5) and (pos[1] == 2 or pos[0] == 5):
-            return val/2
+            return val / 2
         else:
             return 0
 
-    @staticmethod
-    def safety_val(black,white,logic):
+    def safety_val(self, black, white, logic):
         return len(black[4].getMoves(logic)) - len(white[12].getMoves(logic))
 
-
     # check for endgame
-    @staticmethod
-    def checkEndGame(black, white):
+    def checkEndGame(self, black, white):
         # check for white win
         if str(black[4]) != "K0":
             return float('-inf')
@@ -275,8 +263,8 @@ class CPU:
         elif len(set(white + black)) == 4:
             return 0
 
-    @staticmethod
-    def printBoard(listLogicBoard):
+
+    def printBoard(self, listLogicBoard):
         for row in range(len(listLogicBoard)):
             print("")
             for col in range(len(listLogicBoard)):
@@ -287,8 +275,7 @@ class CPU:
                     print(square, end=" ")
         print("")
 
-    @staticmethod
-    def printLine(line):
+    def printLine(self, line):
         for row in range(len(line)):
             square = line[row]
             if square is None:
