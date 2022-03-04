@@ -171,7 +171,7 @@ class Controller:  # keeps the logic board and rules of the game
 
     # update computer's turn
     def computer_turn(self,t1):
-        next_move = CPU.make_move(self.listLogicBoard, self.black,self.white)
+        next_move = CPU.make_move(self.listLogicBoard, self.black,self.white, 2)
         self.logMove(next_move[0],next_move[1])
 
     # upgrade pawn to queen
