@@ -74,7 +74,7 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        print("-----------------------------------------------------------------")
+        #print("-----------------------------------------------------------------")
         print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
@@ -82,8 +82,8 @@ class Talos:
 
         # check for max depth
         if depth == 0:
-            self.printBoard(logic)
-            print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
+            #self.printBoard(logic)
+            #print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -107,7 +107,7 @@ class Talos:
                 return self.checkEndGame(temp_black, temp_white)
 
             value = self.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
-            print(piece_pos)
+            #print(piece_pos)
 
             if value < min_val:
                 min_val = value
@@ -116,15 +116,15 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        print("MIN: " + str(min_val))
+        #print("MIN: " + str(min_val))
         return min_val
 
     def getMax(self, logic, black, white, depth, alpha, beta):
 
         # check for max depth
         if depth == 0:
-            self.printBoard(logic)
-            print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
+            #self.printBoard(logic)
+            #print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
             return self.evaluation_val(black, white, logic)
 
         # setup max values
@@ -148,7 +148,7 @@ class Talos:
                 return self.checkEndGame(temp_black, temp_white)
 
             value = self.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
-            print(piece_pos)
+            #print(piece_pos)
 
             if value > max_val:
                 max_val = value
@@ -157,7 +157,7 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        print("MAX: " + str(max_val))
+        #print("MAX: " + str(max_val))
         return max_val
 
     def deletePiece(self, black, white, captured):
@@ -210,7 +210,7 @@ class Talos:
     def evaluation_val(self, black, white, logic):
         value_sum, space_sum, center_val = self.sum_val(black, white, logic)
         saftey_val = self.safety_val(black, white, logic)
-        return 1 * value_sum + 0.1 * space_sum + 0.2 * center_val - 0.6 * saftey_val
+        return 0.9 * value_sum + 0.1 * space_sum + 0.2 * center_val - 0.6 * saftey_val
 
     # returns evaluation values
     def sum_val(self, black, white, logic):
@@ -235,7 +235,7 @@ class Talos:
                 moves_sum -= len(moves)
 
                 # check center_control
-                center_val -= self.center_val(piece.pos, piece.value)
+                center_val += self.center_val(piece.pos, piece.value)
 
         return sum, moves_sum, center_val
 
