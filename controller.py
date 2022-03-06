@@ -19,7 +19,7 @@ class Controller:  # keeps the logic board and rules of the game
         self.isGameOver = False
 
         # [pieces, space, center, safety]
-        self.talos = Talos(1, 0.1, 0.2, 0.6)
+        self.talos = Talos(0.7, 0.1, 0.2, 0.6)
 
         self.route = []
 
@@ -174,7 +174,7 @@ class Controller:  # keeps the logic board and rules of the game
 
     # update computer's turn
     def computer_turn(self,t1):
-        next_move = self.talos.make_move(self.listLogicBoard, self.black,self.white, 1)
+        next_move = self.talos.make_move(self.listLogicBoard, self.black,self.white, 2)
         self.logMove(next_move[0],next_move[1])
 
     # upgrade pawn to queen

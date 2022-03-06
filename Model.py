@@ -63,7 +63,7 @@ class Talos:
                 value = self.checkEndGame(temp_black, temp_white)
             else:
                 value = self.getMin(board[0], temp_black, temp_white, depth, alpha, beta)
-                print(piece_pos)
+                #print(piece_pos)
 
             if value > max_val:
                 max_val = value
@@ -74,7 +74,7 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        print("-----------------------------------------------------------------")
+        #print("-----------------------------------------------------------------")
         print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
@@ -82,8 +82,8 @@ class Talos:
 
         # check for max depth
         if depth == 0:
-            self.printBoard(logic)
-            print("VAL: " + str(self.evaluation_val(black, white, logic)))
+            #self.printBoard(logic)
+            #print("VAL: " + str(self.evaluation_val(black, white, logic)))
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -115,15 +115,15 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        print("MIN: " + str(min_val))
+        #print("MIN: " + str(min_val))
         return min_val
 
     def getMax(self, logic, black, white, depth, alpha, beta):
 
         # check for max depth
         if depth == 0:
-            self.printBoard(logic)
-            print("VAL: " + str(self.evaluation_val(black, white, logic)))
+            #self.printBoard(logic)
+            #print("VAL: " + str(self.evaluation_val(black, white, logic)))
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -155,7 +155,7 @@ class Talos:
                     alpha = max_val
                     if beta <= alpha:
                         break
-        print("MAX: " + str(max_val))
+        #print("MAX: " + str(max_val))
         return max_val
 
     def deletePiece(self, black, white, captured):
