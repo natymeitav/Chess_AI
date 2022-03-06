@@ -11,9 +11,6 @@ class Talos:
 
     # return array of posible moves [board,[position before, position after]]
     def getBoards(self, logic, pieces):
-        print("-----------------------------------------------------------------")
-        self.printBoard(logic)
-
         boards = []
         for piece in pieces:
             if piece is not None:
@@ -65,7 +62,8 @@ class Talos:
             if self.checkEndGame(temp_black, temp_white):
                 value = self.checkEndGame(temp_black, temp_white)
             else:
-                value = self.getMin(board[0], black, white, depth, alpha, beta)
+                value = self.getMin(board[0], temp_black, temp_white, depth, alpha, beta)
+                print(piece_pos)
 
             if value > max_val:
                 max_val = value
@@ -76,7 +74,7 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        #print("-----------------------------------------------------------------")
+        print("-----------------------------------------------------------------")
         print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
@@ -85,7 +83,7 @@ class Talos:
         # check for max depth
         if depth == 0:
             self.printBoard(logic)
-            print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
+            print("VAL: " + str(self.evaluation_val(black, white, logic)))
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -109,7 +107,6 @@ class Talos:
                 return self.checkEndGame(temp_black, temp_white)
 
             value = self.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
-            print(piece_pos)
 
             if value < min_val:
                 min_val = value
@@ -126,7 +123,7 @@ class Talos:
         # check for max depth
         if depth == 0:
             self.printBoard(logic)
-            print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
+            print("VAL: " + str(self.evaluation_val(black, white, logic)))
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -150,7 +147,6 @@ class Talos:
                 return self.checkEndGame(temp_black, temp_white)
 
             value = self.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
-            print(piece_pos)
 
             if value > max_val:
                 max_val = value

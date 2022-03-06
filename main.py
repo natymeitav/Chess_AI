@@ -5,13 +5,7 @@ from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
 from kivy.uix.layout import Layout
-from kivy.uix.label import Label
-from kivy.uix.popup import Popup
-
 from controller import Controller
-
-
-# Better red a33721
 
 
 class Cell(Button):  # MAKE A BUTTON
