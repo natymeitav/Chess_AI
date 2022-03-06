@@ -11,6 +11,9 @@ class Talos:
 
     # return array of posible moves [board,[position before, position after]]
     def getBoards(self, logic, pieces):
+        print("-----------------------------------------------------------------")
+        self.printBoard(logic)
+
         boards = []
         for piece in pieces:
             if piece is not None:
@@ -21,8 +24,8 @@ class Talos:
                     piece_pos = piece.pos
 
                     # update boards
-                    temp_logic[move[0], move[1]] = temp_piece
                     temp_logic[temp_piece.pos[0], temp_piece.pos[1]] = None
+                    temp_logic[move[0], move[1]] = temp_piece
 
                     # update piece's first move
                     if temp_logic[move[0], move[1]].firstMove:
@@ -41,11 +44,10 @@ class Talos:
         # setup values
         alpha = float('-inf')
         beta = float('inf')
-        boards = self.getBoards(logic, black)
-        max_board = boards[0][1]
-        max_val = float('-inf')
 
         boards = self.ordering(self.getBoards(logic, black), black, white, logic, False)
+        max_board = boards[0]
+        max_val = float('-inf')
 
         # find best move for black
         for board in boards:
@@ -82,8 +84,8 @@ class Talos:
 
         # check for max depth
         if depth == 0:
-            #self.printBoard(logic)
-            #print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
+            self.printBoard(logic)
+            print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -107,7 +109,7 @@ class Talos:
                 return self.checkEndGame(temp_black, temp_white)
 
             value = self.getMax(board[0], temp_black, temp_white, depth - 1, alpha, beta)
-            #print(piece_pos)
+            print(piece_pos)
 
             if value < min_val:
                 min_val = value
@@ -116,30 +118,30 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        #print("MIN: " + str(min_val))
+        print("MIN: " + str(min_val))
         return min_val
 
     def getMax(self, logic, black, white, depth, alpha, beta):
 
         # check for max depth
         if depth == 0:
-            #self.printBoard(logic)
-            #print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
+            self.printBoard(logic)
+            print("VAL: " + str(self.evaluation_val(black, white, logic)), end=" ")
             return self.evaluation_val(black, white, logic)
 
-        # setup max values
+        # setup mon values
         max_val = float('-inf')
 
         boards = self.ordering(self.getBoards(logic, black), black, white, logic, False)
 
-        # find best move for black
+        # find worst move for black
         for board in boards:
+
             # copy black and white pieces
             temp_black = copy.deepcopy(black)
             temp_white = copy.deepcopy(white)
 
             piece_pos = board[1][1]
-
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = self.deletePiece(temp_black, temp_white, logic[piece_pos[0], piece_pos[1]])
@@ -148,16 +150,16 @@ class Talos:
                 return self.checkEndGame(temp_black, temp_white)
 
             value = self.getMin(board[0], temp_black, temp_white, depth - 1, alpha, beta)
-            #print(piece_pos)
+            print(piece_pos)
 
             if value > max_val:
                 max_val = value
+
                 if alpha < max_val:
                     alpha = max_val
                     if beta <= alpha:
                         break
-
-        #print("MAX: " + str(max_val))
+        print("MAX: " + str(max_val))
         return max_val
 
     def deletePiece(self, black, white, captured):
@@ -182,8 +184,6 @@ class Talos:
             piece_pos = board[1][1]
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
-                black, white = self.deletePiece(black, white,
-                                                logic[piece_pos[0], piece_pos[1]])
                 index = 0
 
             # check for dangerous position
@@ -210,7 +210,7 @@ class Talos:
     def evaluation_val(self, black, white, logic):
         value_sum, space_sum, center_val = self.sum_val(black, white, logic)
         saftey_val = self.safety_val(black, white, logic)
-        return 0.9 * value_sum + 0.1 * space_sum + 0.2 * center_val - 0.6 * saftey_val
+        return self.pieces_im * value_sum + self.space_im * space_sum + self.center_im * center_val - self.saftey_im * saftey_val
 
     # returns evaluation values
     def sum_val(self, black, white, logic):
@@ -244,7 +244,7 @@ class Talos:
         if 3 <= pos[0] <= 4 and 3 <= pos[0] <= 4:
             return val
         elif (pos[0] == 2 or pos[0] == 5) and (pos[1] == 2 or pos[0] == 5):
-            return val / 2
+            return val * 0.75
         else:
             return 0
 
