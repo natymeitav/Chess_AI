@@ -7,7 +7,6 @@ from kivy.uix.image import Image
 from kivy.uix.layout import Layout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
-
 from controller import Controller
 
 
