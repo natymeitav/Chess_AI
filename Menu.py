@@ -12,7 +12,13 @@ from main import Game
 class Menu(Layout):
     def __init__(self):
         Layout.__init__(self)
+        self.setup_menu()
 
+    def start(self, b1):
+        self.clear_widgets()
+        self.add_widget(Game())
+
+    def setup_menu(self):
         self.title = Label(text="Check, Mate")
         self.title.font_size = 80
         self.title.pos = (360, 680)
@@ -66,11 +72,6 @@ class Menu(Layout):
         self.mark0.color = [0, 0, 0, 1]
         self.add_widget(self.mark0)
 
-
-
-    def start(self, b1):
-        self.clear_widgets()
-        self.add_widget(Game())
 
 
 Config.set('graphics', 'resizable', '0')
