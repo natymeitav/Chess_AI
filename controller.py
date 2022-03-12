@@ -19,7 +19,7 @@ class Controller:  # keeps the logic board and rules of the game
         self.isGameOver = False
 
         # [pieces, space, center, safety]
-        self.talos = Talos(0.7, 0.1, 0.2, 0.6)
+        self.talos = Talos(1, 0.3, 0.1, 0.6)
 
         self.route = []
 

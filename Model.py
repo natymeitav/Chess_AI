@@ -63,7 +63,7 @@ class Talos:
                 value = self.checkEndGame(temp_black, temp_white)
             else:
                 value = self.getMin(board[0], temp_black, temp_white, depth, alpha, beta)
-                #print(piece_pos)
+                # print(piece_pos)
 
             if value > max_val:
                 max_val = value
@@ -74,7 +74,7 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        #print("-----------------------------------------------------------------")
+        print("-----------------------------------------------------------------")
         print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
@@ -82,8 +82,8 @@ class Talos:
 
         # check for max depth
         if depth == 0:
-            #self.printBoard(logic)
-            #print("VAL: " + str(self.evaluation_val(black, white, logic)))
+            self.printBoard(logic)
+            print("VAL: " + str(self.evaluation_val(black, white, logic)))
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -115,15 +115,15 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        #print("MIN: " + str(min_val))
+        # print("MIN: " + str(min_val))
         return min_val
 
     def getMax(self, logic, black, white, depth, alpha, beta):
 
         # check for max depth
         if depth == 0:
-            #self.printBoard(logic)
-            #print("VAL: " + str(self.evaluation_val(black, white, logic)))
+            # self.printBoard(logic)
+            # print("VAL: " + str(self.evaluation_val(black, white, logic)))
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -155,7 +155,7 @@ class Talos:
                     alpha = max_val
                     if beta <= alpha:
                         break
-        #print("MAX: " + str(max_val))
+        # print("MAX: " + str(max_val))
         return max_val
 
     def deletePiece(self, black, white, captured):
@@ -237,10 +237,10 @@ class Talos:
 
     # checks for control over the center
     def center_val(self, pos, val):
-        if 3 <= pos[0] <= 4 and 3 <= pos[0] <= 4:
+        if 3 <= pos[0] <= 4 and 3 <= pos[1] <= 4:
             return val
-        elif (pos[0] == 2 or pos[0] == 5) and (pos[1] == 2 or pos[0] == 5):
-            return val * 0.75
+        elif 2 <= pos[0] <= 5 and 2 <= pos[1] <= 5:
+            return val * 0.8
         else:
             return 0
 
@@ -258,7 +258,6 @@ class Talos:
         # check for insufficient material
         elif len(set(white + black)) == 4:
             return 0
-
 
     def printBoard(self, listLogicBoard):
         for row in range(len(listLogicBoard)):
