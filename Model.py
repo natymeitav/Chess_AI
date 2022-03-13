@@ -74,7 +74,6 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        print("-----------------------------------------------------------------")
         print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
@@ -82,8 +81,6 @@ class Talos:
 
         # check for max depth
         if depth == 0:
-            self.printBoard(logic)
-            print("VAL: " + str(self.evaluation_val(black, white, logic)))
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -122,8 +119,6 @@ class Talos:
 
         # check for max depth
         if depth == 0:
-            # self.printBoard(logic)
-            # print("VAL: " + str(self.evaluation_val(black, white, logic)))
             return self.evaluation_val(black, white, logic)
 
         # setup mon values
@@ -155,7 +150,6 @@ class Talos:
                     alpha = max_val
                     if beta <= alpha:
                         break
-        # print("MAX: " + str(max_val))
         return max_val
 
     def deletePiece(self, black, white, captured):
