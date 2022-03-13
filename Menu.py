@@ -4,9 +4,10 @@ from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.uix.layout import Layout
 from kivy.uix.label import Label
+from kivy.uix.image import Image
 from kivy.uix.popup import Popup
 from kivy.uix.slider import Slider
-
+import webbrowser
 from main import Game
 
 
@@ -78,7 +79,7 @@ class Menu(Layout):
 
     def start(self, b1):
         self.clear_widgets()
-        self.add_widget(Game())
+        self.add_widget(Game(self.difficulty.value))
 
     def rebuild_menu(self, b1):
         self.add_widget(self.title)
@@ -95,11 +96,7 @@ class Menu(Layout):
         self.add_widget(self.mark3)
 
     def show_info(self,b1):
-        popup = Popup(title='Test popup',
-                      content=Label(text='Hello world'),
-                      size_hint=(None, None), size=(400, 400))
-        popup.open()
-
+        webbrowser.open("rules.pdf")
 
 
 Config.set('graphics', 'resizable', '0')
