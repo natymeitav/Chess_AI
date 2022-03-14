@@ -19,7 +19,7 @@ class Cell(Button):  # MAKE A BUTTON
 
 class Board(GridLayout):  # Making a randomized chess board
 
-    def __init__(self, difficulty):
+    def __init__(self, difficulty, menu):
         GridLayout.__init__(self)
         self.cols = 8
         self.listGraphBoard = self.buildGraphBoard()
@@ -27,6 +27,7 @@ class Board(GridLayout):  # Making a randomized chess board
         self.addCellsToBoard()
         self.movingPiece = None
         self.difficulty = difficulty
+        self.menu = menu
 
     # output: an empty graphic board
     def buildGraphBoard(self):
@@ -34,7 +35,9 @@ class Board(GridLayout):  # Making a randomized chess board
 
     # reacting to user's press
     def reaction(self, b1):
-        if not self.controller.isGameOver:
+        if self.controller.isGameOver:
+            self.menu.rebuild_menu()
+        else:
             if self.movingPiece is None:
                 if self.controller.listLogicBoard[b1.row, b1.col] is not None:
                     # checks if the player is clicking on a piece
@@ -74,10 +77,6 @@ class Board(GridLayout):  # Making a randomized chess board
                         square.background_color = [0, 1, 1, 1]
                     elif type == 1:
                         square.background_color = [1, 0, 0, 1]
-                    elif type == 2:
-                        square.background_color = [0.933, 0.867, 0.04, 1]
-                    elif type == 3:
-                        square.background_color = [1, 1, 1, 1]
 
     # updates graph board
     def updateGraphBoard(self, old_pos, new_pos):
@@ -94,14 +93,14 @@ class Board(GridLayout):  # Making a randomized chess board
 
 
 class Game(Layout):
-    def __init__(self, difficulty):
+    def __init__(self, difficulty, parent):
         Layout.__init__(self)
 
         self.background = Image(source="img/background.png")
         self.background.pos = (0, 0)
         self.background.size = (820, 820)
 
-        self.board = Board(difficulty)
+        self.board = Board(difficulty, parent)
         self.board.pos = (0, 0)
         self.board.size = (820, 820)
 

@@ -79,9 +79,11 @@ class Menu(Layout):
 
     def start(self, b1):
         self.clear_widgets()
-        self.add_widget(Game(self.difficulty.value))
+        self.add_widget(Game(self.difficulty.value,self))
 
-    def rebuild_menu(self, b1):
+    def rebuild_menu(self):
+        self.clear_widgets()
+
         self.add_widget(self.title)
         self.add_widget(self.startB)
         self.add_widget(self.infoB)
