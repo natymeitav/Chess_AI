@@ -18,9 +18,6 @@ class Controller:  # keeps the logic board and rules of the game
         self.parent = parent
         self.isGameOver = False
 
-        # [pieces, space, center, safety]
-        self.talos = Talos(0.9, 0.2, 0.3, 0.7)
-
         self.route = []
 
     # input: the number of lines\cols
@@ -175,7 +172,7 @@ class Controller:  # keeps the logic board and rules of the game
 
     # update computer's turn
     def computer_turn(self,t1):
-        next_move = self.talos.make_move(self.listLogicBoard, self.black,self.white, self.parent.difficulty)
+        next_move = Talos.make_move(self.listLogicBoard, self.black,self.white, self.parent.difficulty)
         self.parent.recolour(3)
         self.logMove(next_move[0],next_move[1])
 
