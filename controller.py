@@ -130,11 +130,12 @@ class Controller:  # keeps the logic board and rules of the game
             self.whiteTurn = not self.whiteTurn
 
             if not self.whiteTurn:
+                self.parent.recolour(2)
                 Clock.schedule_once(self.computer_turn, 0.1)
 
         else:
             self.isGameOver = True
-            self.parent.endGame(endgame)
+            self.parent.recolour(endgame)
 
     # checks if last board is occurred more than 3 times
     def hasRepeated(self, route):
@@ -175,6 +176,7 @@ class Controller:  # keeps the logic board and rules of the game
     # update computer's turn
     def computer_turn(self,t1):
         next_move = self.talos.make_move(self.listLogicBoard, self.black,self.white, self.parent.difficulty)
+        self.parent.recolour(3)
         self.logMove(next_move[0],next_move[1])
 
     # upgrade pawn to queen

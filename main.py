@@ -63,8 +63,8 @@ class Board(GridLayout):  # Making a randomized chess board
                 self.listGraphBoard[row, col] = temp_cell
                 self.add_widget(temp_cell)
 
-    # notify player of end game
-    def endGame(self,type):
+    # recolor pieces accourding to game type (lose, tie, win, loading, normal)
+    def recolour(self,type):
         for row in self.listGraphBoard:
             for square in row:
                 if square.background_color != [0, 0, 0, 0]:
@@ -74,6 +74,10 @@ class Board(GridLayout):  # Making a randomized chess board
                         square.background_color = [0, 1, 1, 1]
                     elif type == 1:
                         square.background_color = [1, 0, 0, 1]
+                    elif type == 2:
+                        square.background_color = [0, 0.741, 0.502, 1]
+                    elif type == 3:
+                        square.background_color = [1, 1, 1, 1]
 
     # updates graph board
     def updateGraphBoard(self, old_pos, new_pos):
