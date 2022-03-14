@@ -75,7 +75,7 @@ class Board(GridLayout):  # Making a randomized chess board
                     elif type == 1:
                         square.background_color = [1, 0, 0, 1]
                     elif type == 2:
-                        square.background_color = [0, 0.741, 0.502, 1]
+                        square.background_color = [0.933, 0.867, 0.04, 1]
                     elif type == 3:
                         square.background_color = [1, 1, 1, 1]
 
