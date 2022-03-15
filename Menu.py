@@ -1,13 +1,13 @@
+import webbrowser
+
 from kivy.app import App
 from kivy.config import Config
 from kivy.core.window import Window
 from kivy.uix.button import Button
-from kivy.uix.layout import Layout
 from kivy.uix.label import Label
-from kivy.uix.image import Image
-from kivy.uix.popup import Popup
+from kivy.uix.layout import Layout
 from kivy.uix.slider import Slider
-import webbrowser
+
 from main import Game
 
 
@@ -79,7 +79,7 @@ class Menu(Layout):
 
     def start(self, b1):
         self.clear_widgets()
-        self.add_widget(Game(self.difficulty.value,self))
+        self.add_widget(Game(self.difficulty.value, self))
 
     def rebuild_menu(self):
         self.clear_widgets()
@@ -97,7 +97,8 @@ class Menu(Layout):
         self.add_widget(self.mark2)
         self.add_widget(self.mark3)
 
-    def show_info(self,b1):
+
+    def show_info(self, b1):
         webbrowser.open("rules.pdf")
 
 

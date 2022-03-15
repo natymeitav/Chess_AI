@@ -53,7 +53,7 @@ class Talos:
             # check for capture
             if logic[piece_pos[0], piece_pos[1]] is not None:
                 temp_black, temp_white = Talos.deletePiece(temp_black, temp_white,
-                                                          logic[piece_pos[0], piece_pos[1]])
+                                                           logic[piece_pos[0], piece_pos[1]])
 
             if Talos.checkEndGame(temp_black, temp_white):
                 value = Talos.checkEndGame(temp_black, temp_white)
@@ -73,6 +73,7 @@ class Talos:
         print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
 
+    # returns the value of the best move for the opponent
     @staticmethod
     def getMin(logic, black, white, depth, alpha, beta):
 
@@ -109,9 +110,9 @@ class Talos:
                     if beta <= alpha:
                         break
 
-        # print("MIN: " + str(min_val))
         return min_val
 
+    # return the value of best move for computer
     @staticmethod
     def getMax(logic, black, white, depth, alpha, beta):
 
@@ -150,6 +151,7 @@ class Talos:
                         break
         return max_val
 
+    # replaces captured piece with None in piece lists (black & white)
     @staticmethod
     def deletePiece(black, white, captured):
         if captured.isWhite:
@@ -158,6 +160,7 @@ class Talos:
             black[captured.serialNum] = None
         return black, white
 
+    # changes order of moves to find better boards faster
     @staticmethod
     def ordering(boards, allys, enemies, logic, isWhite):
         order = []
@@ -206,9 +209,9 @@ class Talos:
     # returns evaluation values
     @staticmethod
     def sum_val(black, white, logic):
-        sum = 0
-        moves_sum = 0
-        center_val = 0
+        sum = 0  # the sum of pieces on board
+        moves_sum = 0  # the difference between black's possible moves and white's possible moves
+        center_val = 0  # the sum of piece's center of control
         for piece in black:
             if piece is not None:
                 sum += piece.value
@@ -231,7 +234,7 @@ class Talos:
 
         return sum, moves_sum, center_val
 
-    # checks for control over the center
+    # returns piece's control over the center
     @staticmethod
     def center_val(pos, val):
         if 3 <= pos[0] <= 4 and 3 <= pos[1] <= 4:
@@ -241,6 +244,7 @@ class Talos:
         else:
             return 0
 
+    # returns the difference between black king's safety to white king's safety
     @staticmethod
     def safety_val(black, white, logic):
         return len(black[4].getMoves(logic)) - len(white[12].getMoves(logic))
@@ -257,15 +261,3 @@ class Talos:
         # check for insufficient material
         elif len(set(white + black)) == 4:
             return 0
-
-    @staticmethod
-    def printBoard(listLogicBoard):
-        for row in range(len(listLogicBoard)):
-            print("")
-            for col in range(len(listLogicBoard)):
-                square = listLogicBoard[row, col]
-                if square is None:
-                    print("--", end=" ")
-                else:
-                    print(square, end=" ")
-        print("")

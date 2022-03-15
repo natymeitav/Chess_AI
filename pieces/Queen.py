@@ -1,9 +1,10 @@
-from Piece import Piece
 import numpy as np
+from Piece import Piece
+
 
 class Queen(Piece):
-    def __init__(self,isWhite,pos, serial):
-        Piece.__init__(self,isWhite,pos,"Q", serial)
+    def __init__(self, isWhite, pos, serial):
+        Piece.__init__(self, isWhite, pos, "Q", serial)
         self.value = 90 - 180 * (self.isWhite)
 
     # check if queen can perform move

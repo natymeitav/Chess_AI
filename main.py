@@ -1,10 +1,10 @@
 import numpy as np
-from kivy.app import App
 from kivy.config import Config
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
 from kivy.uix.layout import Layout
+
 from controller import Controller
 
 
@@ -23,7 +23,7 @@ class Board(GridLayout):  # Making a randomized chess board
         GridLayout.__init__(self)
         self.cols = 8
         self.listGraphBoard = self.buildGraphBoard()
-        self.controller = Controller(self.cols,self)
+        self.controller = Controller(self.cols, self)
         self.addCellsToBoard()
         self.movingPiece = None
         self.difficulty = difficulty
@@ -42,10 +42,11 @@ class Board(GridLayout):  # Making a randomized chess board
                 if self.controller.listLogicBoard[b1.row, b1.col] is not None:
                     # checks if the player is clicking on a piece
                     self.movingPiece = (b1.row, b1.col)
-                    b1.background_color = [0,0,1,1]
+                    b1.background_color = [0, 0, 1, 1]
             else:
                 self.listGraphBoard[self.movingPiece[0], self.movingPiece[1]].background_color = [1, 1, 1, 1]
-                if self.controller.isLegal(self.movingPiece, (b1.row, b1.col)) and not self.movingPiece == (b1.row,b1.col):
+                if self.controller.isLegal(self.movingPiece, (b1.row, b1.col)) and not self.movingPiece == (
+                b1.row, b1.col):
                     self.controller.logMove(self.movingPiece, (b1.row, b1.col))
                     self.controller.printBoard()
 
@@ -67,7 +68,7 @@ class Board(GridLayout):  # Making a randomized chess board
                 self.add_widget(temp_cell)
 
     # recolor pieces accourding to game type (lose, tie, win, loading, normal)
-    def recolour(self,type):
+    def recolour(self, type):
         for row in self.listGraphBoard:
             for square in row:
                 if square.background_color != [0, 0, 0, 0]:
@@ -86,6 +87,7 @@ class Board(GridLayout):  # Making a randomized chess board
             new_pos[0], new_pos[1]].background_normal = "img/" + str(
             self.controller.listLogicBoard[new_pos[0], new_pos[1]]) + ".png"
 
+    # change pawn to queen on graphic board
     def upgrading_time(self, new):
         self.listGraphBoard[new[0], new[1]].background_down = self.listGraphBoard[
             new[0], new[1]].background_normal = "img/" + str(

@@ -1,8 +1,8 @@
-import numpy as np
-import random
-
-from kivy.clock import Clock
 import copy
+
+import numpy as np
+from kivy.clock import Clock
+
 from Model import Talos
 from pieces import King, Rook, Knight, Bishop, Queen, Pawn
 
@@ -67,6 +67,7 @@ class Controller:  # keeps the logic board and rules of the game
 
         return board
 
+    # creates an instance of a piece by type and side (black\white)
     def createPiece(self, type, isWhite):
         if type == "R":
             return Rook.Rook(isWhite, (-999, -999), -999)
@@ -146,8 +147,7 @@ class Controller:  # keeps the logic board and rules of the game
                     return True
         return False
 
-        # check for win or tie
-
+    # check for endgame
     def checkEndGame(self):
         # check for white win
         endgame = -999
@@ -170,9 +170,9 @@ class Controller:  # keeps the logic board and rules of the game
         return endgame
 
     # update computer's turn
-    def computer_turn(self,t1):
-        next_move = Talos.make_move(self.listLogicBoard, self.black,self.white, self.parent.difficulty)
-        self.logMove(next_move[0],next_move[1])
+    def computer_turn(self, t1):
+        next_move = Talos.make_move(self.listLogicBoard, self.black, self.white, self.parent.difficulty)
+        self.logMove(next_move[0], next_move[1])
 
     # upgrade pawn to queen
     def upgrading_time(self, new):

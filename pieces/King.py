@@ -3,7 +3,7 @@ from Piece import Piece
 
 class King(Piece):
     def __init__(self, isWhite, pos, serial):
-        Piece.__init__(self, isWhite, pos, "K",serial)
+        Piece.__init__(self, isWhite, pos, "K", serial)
         self.value = 900 - 1800 * (self.isWhite)
 
     # check if king can perform move
@@ -18,11 +18,11 @@ class King(Piece):
 
         for row in range(self.pos[0] - 1, self.pos[0] + 2):
             for col in range(self.pos[1] - 1, self.pos[1] + 2):
-                if -1 < row < 8 and -1 < col < 8: # position is on board
-                    if row != self.pos[0] or col != self.pos[1]: # king isn't at position already
-                        if logicBoard[row,col] is None:
-                            moves.append((row,col))
-                        elif logicBoard[row,col].isWhite != self.isWhite:
+                if -1 < row < 8 and -1 < col < 8:  # position is on board
+                    if row != self.pos[0] or col != self.pos[1]:  # king isn't at position already
+                        if logicBoard[row, col] is None:
+                            moves.append((row, col))
+                        elif logicBoard[row, col].isWhite != self.isWhite:
                             moves.append((row, col))
 
         return moves
