@@ -71,7 +71,7 @@ class Menu(Layout):
         self.mark1.color = [0, 0, 0, 1]
         self.add_widget(self.mark1)
 
-        self.mark0 = Label(text="- microwave")
+        self.mark0 = Label(text="- hooman")
         self.mark0.font_size = 27
         self.mark0.pos = (145, 50)
         self.mark0.color = [0, 0, 0, 1]

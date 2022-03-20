@@ -134,7 +134,7 @@ class Controller:  # keeps the logic board and rules of the game
             # set up next turn
             self.whiteTurn = not self.whiteTurn
 
-            if not self.whiteTurn:
+            if not self.whiteTurn and self.parent.difficulty != 0:
                 Clock.schedule_once(self.computer_turn, 0.1)
 
         else:
