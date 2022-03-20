@@ -113,6 +113,13 @@ class Controller:  # keeps the logic board and rules of the game
         if self.listLogicBoard[new_pos[0], new_pos[1]].firstMove:
             self.listLogicBoard[new_pos[0], new_pos[1]].firstMove = False
 
+            # check for castling
+            if piece.type == "K":
+                if new_pos[1] == 2:
+                    self.castle([new_pos[0],0],[new_pos[0],3])
+                elif new_pos[1] == 6:
+                    self.castle([new_pos[0],7],[new_pos[0],5])
+
         # update piece's position
         piece.pos = new_pos
 
@@ -180,6 +187,24 @@ class Controller:  # keeps the logic board and rules of the game
         if piece.type == "P" and (new[0] == 0 or new[0] == 7):  # upgrading time
             self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new, piece.serialNum)
             self.parent.upgrading_time(new)
+
+    # moves rook to castle
+    def castle(self,old_pos, new_pos):
+        piece = self.listLogicBoard[old_pos[0], old_pos[1]]
+
+        # update logic board
+        self.listLogicBoard[old_pos[0], old_pos[1]] = None
+        self.listLogicBoard[new_pos[0], new_pos[1]] = piece
+
+        # update piece's first move
+        self.listLogicBoard[new_pos[0], new_pos[1]].firstMove = False
+
+        # update piece's position
+        piece.pos = new_pos
+
+        # update graph board
+        self.parent.updateGraphBoard(old_pos, new_pos)
+
 
     # input: the captured piece
     # removes the piece from pieces array

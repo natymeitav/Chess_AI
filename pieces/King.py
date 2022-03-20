@@ -1,3 +1,5 @@
+import numpy as np
+
 from Piece import Piece
 
 
@@ -8,8 +10,8 @@ class King(Piece):
 
     # check if king can perform move
     def canMakeMove(self, new, logicBoard):
-        if self.firstMove:
-            self.firstMove = False
+        if self.canCastle(new, logicBoard):
+            return True
         return abs(new[0] - self.pos[0]) <= 1 and abs(new[1] - self.pos[1]) <= 1
 
     # returns all potential moves
@@ -25,4 +27,25 @@ class King(Piece):
                         elif logicBoard[row, col].isWhite != self.isWhite:
                             moves.append((row, col))
 
+        # castling
+        if self.canCastle([self.pos[0],2],logicBoard):
+            moves.append([self.pos[0],2])
+        if self.canCastle([self.pos[0],6],logicBoard):
+            moves.append([self.pos[0],6])
+
         return moves
+
+    # checks if king can castle
+    def canCastle(self,new, logic):
+        if self.firstMove:
+            if new[1] == 2:
+                rook = logic[self.pos[0],0]
+                if rook is not None:
+                    if rook.firstMove:
+                        return np.all(logic[self.pos[0], rook.pos[1] + 1:self.pos[1]] == None)
+
+            if new[1] == 6:
+                rook = logic[self.pos[0],7]
+                if rook is not None:
+                    if rook.firstMove:
+                        return np.all(logic[self.pos[0], self.pos[1] + 1:rook.pos[1]] == None)

@@ -23,12 +23,36 @@ class Talos:
                     if temp_logic[move[0], move[1]].firstMove:
                         temp_logic[move[0], move[1]].firstMove = False
 
+                        # check for castling
+                        if piece.type == "K":
+                            if move[1] == 2:
+                                temp_logic = Talos.castle([move[0], 0], [move[0], 3],temp_logic)
+                            elif move[1] == 6:
+                                temp_logic = Talos.castle([move[0], 7], [move[0], 5],temp_logic)
+
                     # update piece's position
                     temp_logic[move[0], move[1]].pos = move
 
                     boards.append([temp_logic, [piece_pos, (move[0], move[1])]])
 
         return boards
+
+    # moves rook to castle
+    @staticmethod
+    def castle(old_pos, new_pos, logic):
+        piece = logic[old_pos[0], old_pos[1]]
+
+        # update logic board
+        logic[old_pos[0], old_pos[1]] = None
+        logic[new_pos[0], new_pos[1]] = piece
+
+        # update piece's first move
+        logic[new_pos[0], new_pos[1]].firstMove = False
+
+        # update piece's position
+        piece.pos = new_pos
+
+        return logic
 
     # find best next move
     @staticmethod
