@@ -67,7 +67,7 @@ class Board(GridLayout):  # Making a randomized chess board
                 self.listGraphBoard[row, col] = temp_cell
                 self.add_widget(temp_cell)
 
-    # recolor pieces accourding to game type (lose, tie, win, loading, normal)
+    # recolor pieces accourding to game type: lose, tie, win (for the computer)
     def recolour(self, type):
         for row in self.listGraphBoard:
             for square in row:

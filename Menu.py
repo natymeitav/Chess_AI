@@ -7,7 +7,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.layout import Layout
 from kivy.uix.slider import Slider
-
+from kivy.uix.image import Image
 from main import Game
 
 
@@ -21,9 +21,14 @@ class Menu(Layout):
         self.title.color = [0, 0, 0, 1]
         self.add_widget(self.title)
 
+        self.talos = Image(source="img/Talos.png")
+        self.talos.pos = (370, 380)
+        self.talos.size = (390, 390)
+        self.add_widget(self.talos)
+
         self.startB = Button(text="START")
         self.startB.size = (360, 180)
-        self.startB.pos = (370, 80)
+        self.startB.pos = (370, 50)
         self.startB.background_color = [0, 1, 0, 1]
         self.startB.bind(on_press=self.start)
         self.startB.font_size = 30
@@ -31,7 +36,7 @@ class Menu(Layout):
 
         self.infoB = Button(text="chess?")
         self.infoB.size = (360, 180)
-        self.infoB.pos = (370, 300)
+        self.infoB.pos = (370, 260)
         self.infoB.background_color = [1, 0, 0, 1]
         self.infoB.bind(on_press=self.show_info)
         self.infoB.font_size = 30
