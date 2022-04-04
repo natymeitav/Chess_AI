@@ -11,8 +11,6 @@ from controller import Controller
 class Cell(Button):  # MAKE A BUTTON
     def __init__(self, row, col):
         Button.__init__(self)
-        self.bold = False
-        self.font_size = 40
         self.row = row  # cell's row
         self.col = col  # cell's col
 
@@ -22,16 +20,30 @@ class Board(GridLayout):  # Making a randomized chess board
     def __init__(self, difficulty, menu):
         GridLayout.__init__(self)
         self.cols = 8
-        self.listGraphBoard = self.buildGraphBoard()
         self.controller = Controller(self.cols, self)
-        self.addCellsToBoard()
+        self.listGraphBoard = self.buildGraphBoard()
         self.movingPiece = None
         self.difficulty = difficulty
         self.menu = menu
 
-    # output: an empty graphic board
+    # builds graphic board
     def buildGraphBoard(self):
-        return np.empty((self.cols, self.cols), dtype=Cell)
+        graphBoard = np.empty((self.cols, self.cols), dtype=Cell)
+
+        for row in range(self.cols):
+            for col in range(self.cols):
+                temp_cell = Cell(row, col)
+                temp_cell.background_color = [0, 0, 0, 0]
+                if self.controller.listLogicBoard[row, col] is not None:
+                    temp_cell.background_color = [1, 1, 1, 1]
+                    temp_cell.background_down = temp_cell.background_normal = "img/" + str(
+                        self.controller.listLogicBoard[
+                            row, col]) + ".png"
+                temp_cell.bind(on_press=self.reaction)
+                graphBoard[row, col] = temp_cell
+                self.add_widget(temp_cell)
+
+        return graphBoard
 
     # reacting to user's press
     def reaction(self, b1):
@@ -51,21 +63,6 @@ class Board(GridLayout):  # Making a randomized chess board
                     self.controller.printBoard()
 
                 self.movingPiece = None
-
-    # adds cells to graphic board
-    def addCellsToBoard(self):
-        for row in range(self.cols):
-            for col in range(self.cols):
-                temp_cell = Cell(row, col)
-                temp_cell.background_color = [0, 0, 0, 0]
-                if self.controller.listLogicBoard[row, col] is not None:
-                    temp_cell.background_color = [1, 1, 1, 1]
-                    temp_cell.background_down = temp_cell.background_normal = "img/" + str(
-                        self.controller.listLogicBoard[
-                            row, col]) + ".png"
-                temp_cell.bind(on_press=self.reaction)
-                self.listGraphBoard[row, col] = temp_cell
-                self.add_widget(temp_cell)
 
     # recolor pieces accourding to game type: lose, tie, win (for the computer)
     def recolour(self, type):
@@ -88,7 +85,7 @@ class Board(GridLayout):  # Making a randomized chess board
             self.controller.listLogicBoard[new_pos[0], new_pos[1]]) + ".png"
 
     # change pawn to queen on graphic board
-    def upgrading_time(self, new):
+    def upgradingTime(self, new):
         self.listGraphBoard[new[0], new[1]].background_down = self.listGraphBoard[
             new[0], new[1]].background_normal = "img/" + str(
             self.controller.listLogicBoard[new[0], new[1]]) + ".png"

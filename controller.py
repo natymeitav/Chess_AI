@@ -18,10 +18,8 @@ class Controller:  # keeps the logic board and rules of the game
         self.parent = parent
         self.isGameOver = False
 
-        self.route = []
-
     # input: the number of lines\cols
-    # output: a logic board with every position set to 'empty'
+    # output: a logic board
     def buildLogicBoard(self, cols):
         board = np.full((cols, cols), None)
 
@@ -141,19 +139,6 @@ class Controller:  # keeps the logic board and rules of the game
             self.isGameOver = True
             self.parent.recolour(endgame)
 
-    # checks if last board is occurred more than 3 times
-    def hasRepeated(self, route):
-        if len(route) == 0:
-            return False
-        board = route[-1][0]
-        times = 0
-        for index in range(len(route) - 1):
-            if board == route[index][0]:
-                times += 1
-                if times > 3:
-                    return True
-        return False
-
     # check for endgame
     def checkEndGame(self):
         # check for white win
@@ -169,14 +154,9 @@ class Controller:  # keeps the logic board and rules of the game
         elif len(set(self.white + self.black)) == 4:
             print("--insufficient material--")
             endgame = 0
-        # check for repeated action
-        elif self.hasRepeated(self.route):
-            print("--repeated action--")
-            endgame = 0
-
         return endgame
 
-    # update computer's turn
+    # get computer's move
     def computer_turn(self, t1):
         next_move = Talos.make_move(self.listLogicBoard, self.black, self.white, self.parent.difficulty)
         self.logMove(next_move[0], next_move[1])
@@ -186,7 +166,7 @@ class Controller:  # keeps the logic board and rules of the game
         piece = self.listLogicBoard[new[0], new[1]]
         if piece.type == "P" and (new[0] == 0 or new[0] == 7):  # upgrading time
             self.listLogicBoard[new[0], new[1]] = Queen.Queen(piece.isWhite, new, piece.serialNum)
-            self.parent.upgrading_time(new)
+            self.parent.upgradingTime(new)
 
     # moves rook to castle
     def castle(self,old_pos, new_pos):

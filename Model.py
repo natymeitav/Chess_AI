@@ -37,7 +37,7 @@ class Talos:
 
         return boards
 
-    # moves rook to castle
+    # moves rook while castling
     @staticmethod
     def castle(old_pos, new_pos, logic):
         piece = logic[old_pos[0], old_pos[1]]
@@ -226,13 +226,13 @@ class Talos:
     # returns value of board
     @staticmethod
     def evaluation_val(black, white, logic):
-        value_sum, space_sum, center_val = Talos.sum_val(black, white, logic)
+        value_sum, space_sum, center_val = Talos.get_values(black, white, logic)
         saftey_val = Talos.safety_val(black, white, logic)
         return 0.9 * value_sum + 0.2 * space_sum + 0.3 * center_val - 0.7 * saftey_val
 
     # returns evaluation values
     @staticmethod
-    def sum_val(black, white, logic):
+    def get_values(black, white, logic):
         sum = 0  # the sum of pieces on board
         moves_sum = 0  # the difference between black's possible moves and white's possible moves
         center_val = 0  # the sum of piece's center of control
