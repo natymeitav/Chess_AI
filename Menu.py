@@ -1,7 +1,5 @@
 import webbrowser
-
 from kivy.app import App
-from kivy.config import Config
 from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -102,14 +100,9 @@ class Menu(Layout):
         webbrowser.open("rules.pdf")
 
 
-Config.set('graphics', 'resizable', '0')
-Config.set('graphics', 'width', '820')
-Config.set('graphics', 'height', '820')
-Config.write()
-
-
 class MenuApp(App):
     def build(self):
+        Window.size = [820,820]
         Window.clearcolor = (0.31, 0.60, 0.66, 1)
         self.title = "Random Chess"
         return Menu()

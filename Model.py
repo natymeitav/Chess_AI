@@ -64,7 +64,7 @@ class Talos:
 
         boards = Talos.ordering(Talos.getBoards(logic, black), black, white, logic, False)
         max_board = boards[0]
-        max_val = float('-inf')
+        max_val = float('inf')
 
         # find best move for black
         for board in boards:
@@ -82,17 +82,17 @@ class Talos:
             if Talos.checkEndGame(temp_black, temp_white):
                 value = Talos.checkEndGame(temp_black, temp_white)
             else:
-                value = Talos.getMin(board[0], temp_black, temp_white, depth, alpha, beta)
+                value = Talos.getMax(board[0], temp_black, temp_white, depth, alpha, beta)
                 # print(piece_pos)
 
-            if value > max_val:
+            if value < max_val:
                 max_val = value
                 max_board = board
 
-                if alpha < max_val:
-                    alpha = max_val
-                    if beta <= alpha:
-                        break
+                #if alpha < max_val:
+                #    alpha = max_val
+                #    if beta <= alpha:
+                #        break
 
         print(str(max_board[1][1]) + " " + str(max_val))
         return max_board[1]
@@ -108,7 +108,7 @@ class Talos:
         # setup mon values
         min_val = float('inf')
 
-        boards = Talos.ordering(Talos.getBoards(logic, white), white, black, logic, False)
+        boards = Talos.ordering(Talos.getBoards(logic, black), white, black, logic, False)
 
         # find worst move for black
         for board in boards:
@@ -147,7 +147,7 @@ class Talos:
         # setup mon values
         max_val = float('-inf')
 
-        boards = Talos.ordering(Talos.getBoards(logic, black), black, white, logic, False)
+        boards = Talos.ordering(Talos.getBoards(logic, white), black, white, logic, False)
 
         # find worst move for black
         for board in boards:
